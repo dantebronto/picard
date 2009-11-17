@@ -1,0 +1,1 @@
+require('../vendor/picard/lib/picard/picard')
