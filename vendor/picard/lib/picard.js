@@ -1,14 +1,9 @@
 var sys = require('sys')
-var Haml = require('./picard/haml')
 
 picard = exports;
 picard.routes = require('./picard/routes')
 
-sys.puts(picard.routes.engage())
-
 picard.start = function() {
-  // simplex.controller.loadAll()
-
   require('http').createServer(function(request, response) {
     try {
       picard.routes.engage(request, response)
@@ -34,7 +29,6 @@ picard.handle_exception = function(ex, response) {
   response.finish();
 }
 
-
 // http.createServer(function (request, response) {
 //   
 //   var scope = {
@@ -49,10 +43,6 @@ picard.handle_exception = function(ex, response) {
 //     }
 //   };
 //   
-//   Haml.render(scope, scope.template, function(res){  
-//     response.sendHeader(200, {"Content-Type": "text/html"});
-//     response.sendBody(res);
-//     response.finish();
-//   });
+
 // 
 // }).listen(9900);

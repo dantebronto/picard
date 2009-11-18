@@ -1,3 +1,6 @@
 require('./config/env')
 
-var sys = require('sys')
+get('/foo', function(){
+  return 2 + 2;
+})
+
