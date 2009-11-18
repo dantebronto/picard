@@ -1,20 +1,21 @@
 var sys = require('sys')
 var Haml = require('./haml')
+var json = require('./json2')
 
 var get_routes = {}
 
 function render(scope){
   var response = scope.response
-  var status = scope.status || "200"
+  var status = scope.status || 200
   var body = scope.text || scope.body || null
   var type = scope.type || "text/html"
-  
   var template = scope.template || null
+  
   if( template ){ template = picard.env.root + '/views/' + template }
 
   if(template){
     Haml.render(scope, template, function(rendered_content){   
-      response.sendHeader(200, {"Content-Type": "text/html"})
+      response.sendHeader(200, {"Content-Type": type})
       response.sendBody(rendered_content)
       response.finish()
     }) 
@@ -29,8 +30,17 @@ var routes = {
   engage: function(request, response){
     var scope = null;
     
-    if(request.method == "GET" && get_routes[request.uri.path] != undefined){
-      scope = get_routes[request.uri.path]()
+    if(request.method == "GET"){
+      for(var key in get_routes){
+        var regexp = new RegExp(key.replace(/:[^/]*/g, '([^/]*)'))
+
+        match_data = request.uri.path.match(regexp)
+        if(match_data){
+          match_data.shift()
+          scope = get_routes[key].apply(null, match_data)
+          break
+        }
+      }
     }
     routes.on_screen(response, scope)
   },
