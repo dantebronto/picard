@@ -1,7 +1,7 @@
 h3. Picard: A Micro-framework for NodeJS
 
-p. Usage: install Node (http://nodejs.org/) and start the app with `node app.js`. There are no other dependencies. 
+p. If you want to check it out, install NodeJS:http://nodejs.org and start the app with `node app.js`. There are no other dependencies. 
 
 !http://bloglikepattern.com/images/picard.png!
 
-p. Right now it only supports stupid simple GET requests. It does, however, support Haml thanks to creationix's haml-js project.
+p. Right now it only supports stupid simple GET requests, but it does support Haml thanks to creationix's haml-js project.
