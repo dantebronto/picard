@@ -1,6 +1,11 @@
 require('./config/env')
 
-get('/foo', function(){
-  return 2 + 2;
+get('/replicate', function(){
+  return { text: "<h1>Tea, Earl Grey, hot!</h1>", status: 200 } // 200 is default status
 })
+
+get('/haml', function(){
+  
+})
+
 

@@ -4,54 +4,38 @@ var Haml = require('./haml')
 var get_routes = {}
 
 function render(scope){
+  var response = scope.response
   var status = scope.status || "200"
   var body = scope.body || scope.text || null
-  var type = scope.type || "text/html"  
+  var type = scope.type || "text/html"
+  //sys.puts(picard.env.root + "/views")
+
+  response.sendHeader(status, {"Content-Type": type})
+  if(body)
+    response.sendBody(body)    
+  response.finish()
 }
 
 var routes = {
   engage: function(request, response){
-
-//sys.puts(picard.env.root + "/views")
-
-// { full: "/status?name=ryan",
-//   path: "/status",
-//   queryString: "name=ryan",
-//   params: { "name": "ryan" },
-//   fragment: ""
-// }
-    var handler = null;
+    var scope = null;
     
     if(request.method == "GET" && get_routes[request.uri.path] != undefined){
-      handler = get_routes['/foo']()
+      scope = get_routes[request.uri.path]()
     }
-    
-    if(typeof(handler == 'object')
-      routes.with_scope(response, handler)
-    else if(typeof(handler) == 'string')
-      routes.plain(response, handler)
-    else if(handler == null)
-      routes.not_found(response)
-    else 
-      routes.error(response)
+    routes.on_screen(response, scope)
   },
-  with_scope: function(response, handler){
-    // do nothign for now
-  },
-  plain: function(response, handler){
-    response.sendHeader(200, {"Content-Type": "text/html"})
-    response.sendBody(handler)    
-    response.finish()    
-  },
-  not_found: function(response){
-    response.sendHeader(404, {"Content-Type": "text/html"})
-    response.sendBody("<h1>404 Not Found</h1>")    
-    response.finish()
-  },
-  error: function(response){
-    response.sendHeader(500, {"Content-Type": "text/html"})
-    response.sendBody("<h1>500 Error</h1>")    
-    response.finish()
+  on_screen: function(response, scope){
+    if( scope != null && typeof(scope) == 'object' ){
+      scope.response = response
+      render(scope)  
+    } else if( typeof(scope) == 'string' ) {
+      render({response: response, text: scope})
+    } else if( scope == null ) {
+      render({response: response, text: "<h1>404 Not Found</h1>", status: 404})
+    } else {
+      render({response: response, text: "<h1>500 Error</h1>", status: 500})
+    }
   }
 }
 
