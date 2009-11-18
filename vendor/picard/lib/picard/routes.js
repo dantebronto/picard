@@ -6,12 +6,12 @@ var get_routes = {}
 function render(scope){
   var response = scope.response
   var status = scope.status || "200"
-  var body = scope.body || scope.text || null
+  var text = scope.text || null
   var type = scope.type || "text/html"
   //sys.puts(picard.env.root + "/views")
 
   response.sendHeader(status, {"Content-Type": type})
-  if(body){ response.sendBody(body) }
+  if(text){ response.sendBody(text) }
   response.finish()
 }
 
@@ -40,7 +40,6 @@ var routes = {
 
 GLOBAL.get = function(path, handler){
   get_routes[path] = handler
-  sys.puts(get_routes[path])
 }
 
 exports.engage = routes.engage;
