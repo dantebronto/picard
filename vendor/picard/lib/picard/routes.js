@@ -6,13 +6,23 @@ var get_routes = {}
 function render(scope){
   var response = scope.response
   var status = scope.status || "200"
-  var text = scope.text || null
+  var body = scope.text || scope.body || null
   var type = scope.type || "text/html"
-  //sys.puts(picard.env.root + "/views")
+  
+  var template = scope.template || null
+  if( template ){ template = picard.env.root + '/views/' + template }
 
-  response.sendHeader(status, {"Content-Type": type})
-  if(text){ response.sendBody(text) }
-  response.finish()
+  if(template){
+    Haml.render(scope, template, function(rendered_content){   
+      response.sendHeader(200, {"Content-Type": "text/html"})
+      response.sendBody(rendered_content)
+      response.finish()
+    }) 
+  } else if(body) {
+    response.sendHeader(status, {"Content-Type": type})
+    response.sendBody(body)
+    response.finish()
+  }
 }
 
 var routes = {

@@ -5,5 +5,15 @@ get('/order', function(){
 })
 
 get('/haml', function(){
-  
+  var scope = {
+    template: 'index.haml', 
+    print_date: function () {
+      return (new Date()).toDateString();
+    },
+    current_user: {
+      name: "Jean-Luc Picard",
+      bio: "Captain of the USS Enterprise"
+    }
+  };
+  return scope;
 })

@@ -28,21 +28,3 @@ picard.handle_exception = function(ex, response) {
   response.sendBody(body);
   response.finish();
 }
-
-// http.createServer(function (request, response) {
-//   
-//   var scope = {
-//     template: 'test.haml', 
-//     print_date: function () {
-//       return (new Date()).toDateString();
-//     },
-//     current_user: {
-//       address: "Atlanta, GA",
-//       email: "klpresley@gmail.com",
-//       bio: "Experienced software professional..."
-//     }
-//   };
-//   
-
-// 
-// }).listen(9900);
