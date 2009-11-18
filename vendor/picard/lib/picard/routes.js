@@ -11,8 +11,7 @@ function render(scope){
   //sys.puts(picard.env.root + "/views")
 
   response.sendHeader(status, {"Content-Type": type})
-  if(body)
-    response.sendBody(body)    
+  if(body){ response.sendBody(body) }
   response.finish()
 }
 
