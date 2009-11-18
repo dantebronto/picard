@@ -1,6 +1,6 @@
 h3. Picard: A Micro-framework for NodeJS
 
-p. If you want to check it out, install "Node":http://nodejs.org and start the app with `node app.js`. There are no other dependencies. 
+p. If you want to check it out, install "Node":http://nodejs.org and start it with `node app.js`. There are no other dependencies. 
 
 !http://bloglikepattern.com/images/picard.png!
 
