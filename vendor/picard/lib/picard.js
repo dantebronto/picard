@@ -19,12 +19,12 @@ picard.start = function() {
 picard.handle_exception = function(ex, response) {
   sys.puts(ex.message)
   sys.puts(ex.stack)
-
-  var body = ''
-  body = '<h3>' + ex.message + '</h3>'
+  
+  var body = '<h1> 500 Error </h1>'
+  body += '<h3>' + ex.message + '</h3>'
   body += '<pre>' + ex.stack + '</pre>'
-
-  response.sendHeader(200, {"Content-Type": "text/html"});
+  
+  response.sendHeader(500, {"Content-Type": "text/html"});
   response.sendBody(body);
   response.finish();
 }

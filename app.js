@@ -34,8 +34,8 @@ get('/name/:first/:last/?', function(req){
   return { text: "<h1>Hello " + req.uri.params.first + " " + req.uri.params.last + "</h1>" }
 })
 
-get('^/$', function(req){
-  return { text: 'hello world', status: 200 } // 200 is the default status
+get('/', function(req){
+  return { text: 'hello world' }
 })
 
 get('/redirect', function(req){
