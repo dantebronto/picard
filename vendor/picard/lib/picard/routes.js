@@ -1,76 +1,86 @@
 var posix = require('posix')
-var routes = {}
 
-routes.engage = function(request, response){
+var routes = {
+  engage: function(request, response){
   
-  request.extract_params = function(route, match_data){
-    var param_keys = route.match(/:[^/]*/g)
-    if(param_keys){
-      for(var i=0; i < param_keys.length; i++){
-        var key = param_keys[i].replace(':', '')
-        this.uri.params[key] = match_data[i+1]
+    request.extract_params = function(route, match_data){
+      var param_keys = route.match(/:[^/]*/g)
+      if(param_keys){
+        for(var i=0; i < param_keys.length; i++){
+          var key = param_keys[i].replace(':', '')
+          this.uri.params[key] = match_data[i+1]
+        }
       }
     }
-  }
   
-  response.on_screen = function(scope){
-    var self = this
+    request.serve_static = function(){
+      try {
+        var filename = picard.env.root + '/public' + this.uri.path
+        scope = { 
+          body: posix.cat(filename).wait(),
+          type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0])
+        }
+      } catch(e) {
+        scope = null
+      }
+    }
+  
+    response.on_screen = function(scope){
+      var self = this
     
-    if ( scope == null )
-      scope = { status: 404, body: "<h1> 404 Not Found </h1>" }
+      if ( scope == null )
+        scope = { status: 404, body: "<h1> 404 Not Found </h1>" }
     
-    var response = scope.response
-    var status = scope.status || 200
-    var body = scope.text || scope.body || ''
-    var type = scope.type || "text/html"
-    var template = scope.template || null
-    var headers = scope.headers || {}
+      var response = scope.response
+      var status = scope.status || 200
+      var body = scope.text || scope.body || ''
+      var type = scope.type || "text/html"
+      var template = scope.template || null
+      var headers = scope.headers || {}
     
-    if(typeof(scope) == 'string')
-      body = scope
+      if(typeof(scope) == 'string')
+        body = scope
     
-    headers['Content-Type'] = type
-    self.sendHeader(status, headers)
+      headers['Content-Type'] = type
+      self.sendHeader(status, headers)
     
-    if(template){
-      template = picard.env.root + '/views/' + template
-      require('./haml').render(scope, template, function(body){
+      if(template){
+        template = picard.env.root + '/views/' + template
+        require('./haml').render(scope, template, function(body){
+          self.sendBody(body)
+          self.finish()
+        })
+      } else {
         self.sendBody(body)
         self.finish()
-      })
-    } else {
-      self.sendBody(body)
-      self.finish()
-    }  
-  }
+      }  
+    }
   
-  var scope = null;
+    var scope = null;
   
-  if(request.method == "GET"){
+    if(request.method == "GET")
+      scope = routes.handle_get(request)
+    
+    if( scope == null )
+      request.serve_static()
+      
+    response.on_screen(scope)
+  },
+  handle_get: function(request){
     for(var route in get_routes){
-      var full_route = '^'+route+'$'
-      var regexp = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
-      var match_data = request.uri.path.match(regexp)
+      var match_data = routes.match(request.uri.path, route)
       
       if(match_data){ // incoming request matches route
         request.extract_params(route, match_data)
-        scope = get_routes[route](request)
-        break
+        return get_routes[route](request)
       }
     }
+  },
+  match: function(path, route){
+    var full_route = '^'+route+'$'
+    var regexp = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
+    return path.match(regexp)
   }
-  if( scope == null ){
-    try {
-      var filename = picard.env.root + '/public' + request.uri.path
-      scope = { 
-        body: posix.cat(filename).wait(),
-        type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0])
-      }
-    } catch(e) {
-      scope = null
-    }
-  }
-  response.on_screen(scope)
 }
 
 var get_routes = {}
