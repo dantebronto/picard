@@ -1,0 +1,1 @@
+alert('hello from static js file!');

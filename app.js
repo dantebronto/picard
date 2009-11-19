@@ -41,4 +41,3 @@ get('/', function(req){
 get('/redirect', function(req){
   return {  headers: { location: '/haml' }, status: 302 }
 })
-
