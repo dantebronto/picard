@@ -1,10 +1,10 @@
 require('./config/env')
 
-get('/order', function(){
+get('/order', function(req){
   return { text: "<h1>Tea, Earl Grey, hot.</h1>" }
 })
 
-get('/haml', function(){
+get('/haml', function(req){
   var scope = {
     template: 'index.haml', 
     print_date: function () {
@@ -18,7 +18,7 @@ get('/haml', function(){
   return scope;
 })
 
-get('/json', function(){
+get('/json', function(req){
   return {
     type: 'application/json',
     body: JSON.stringify(
@@ -30,10 +30,15 @@ get('/json', function(){
   }
 })
 
-get('/name/:firstname/:lastname/?', function(firstname, lastname){
-  return { text: "<h1>Hello " + firstname + " " + lastname + "</h1>" }
+get('/name/:first/:last/?', function(req){
+  return { text: "<h1>Hello " + req.uri.params.first + " " + req.uri.params.last + "</h1>" }
 })
 
-get('/', function(){
+get('^/$', function(req){
   return { text: 'hello world', status: 200 } // 200 is the default status
 })
+
+get('/redirect', function(req){
+  return {  headers: { location: '/haml' }, status: 302 }
+})
+
