@@ -1,6 +1,5 @@
 var sys = require('sys')
 var Haml = require('./haml')
-var json = require('./json2')
 
 var get_routes = {}
 
