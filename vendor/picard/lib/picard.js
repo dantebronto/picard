@@ -1,7 +1,7 @@
 var sys = require('sys')
 
 picard = exports;
-picard.routes = require('./picard/routes')
+picard.routes = require('./picard/engine')
 
 picard.start = function() {
   require('http').createServer(function(request, response) {

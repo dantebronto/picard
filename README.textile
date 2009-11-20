@@ -4,4 +4,6 @@ p. If you want to check it out, install "Node":http://nodejs.org and start it wi
 
 !http://bloglikepattern.com/images/picard.png!
 
-p. Right now it only supports stupid simple GET requests, but it does support Haml thanks to creationix's haml-js project.
+p. Picard uses Haml thanks to creationix's haml-js project.
+
+p. Red Alert: Picard is just for fun, so don't use it for reals.

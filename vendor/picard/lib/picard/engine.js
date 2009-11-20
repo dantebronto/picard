@@ -36,7 +36,7 @@ var routes = {
     request.resolve = function(response){
       var scope = null
       
-      scope = routes.handle(this, request.method)
+      scope = routes.execute_callback(this)
         
       if( scope == null )
         this.serve_static()
@@ -79,12 +79,24 @@ var routes = {
     }
   },
   
-  handle: function(request, method){
-    var route_array = []
+  execute_callback: function(request){
+    var rest_type = routes.rest_type(request)
     
-    if(method == "GET")
+    for(var route in route_array){
+      var matches = routes.match(request.uri.path, route)
+      
+      if( matches ){ // incoming request matches route
+        request.extract_route_params(route, matches)
+        return rest_type[route](request)
+      }
+    }
+  },
+
+  rest_type: function(request){
+    route_array = []
+    if(request.method == "GET")
       route_array = get_routes
-    else if(method == "POST"){
+    else if(request.method == "POST"){
       route_array = post_routes
       
       var rest_method = request._method
@@ -95,17 +107,9 @@ var routes = {
         route_array = delete_routes
       }
     }
-    
-    for(var route in route_array){
-      var match_data = routes.match(request.uri.path, route)
-      
-      if(match_data){ // incoming request matches route
-        request.extract_route_params(route, match_data)
-        return route_array[route](request)
-      }
-    }
+    return route_array
   },
-  
+
   match: function(path, route){
     var full_route = '^'+route+'$'
     var regexp = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
