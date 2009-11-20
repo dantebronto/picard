@@ -3,19 +3,8 @@ var posix = require('posix')
 var routes = {
   engage: function(request, response){
     
-    request.serve_static = function(){
-      try {
-        var filename = picard.env.root + '/public' + this.uri.path
-        scope = { 
-          body: posix.cat(filename).wait(),
-          type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0])
-        }
-      } catch(e) {
-        scope = null
-      }
-    }
-    
     request.extract_form_params = function(chunk){
+      if( chunk == undefined ) { return }
       var chunks = chunk.split('&')
       for(var i in chunks){
         var k_v = chunks[i].split('=')
@@ -39,9 +28,22 @@ var routes = {
       scope = routes.execute_callback(this)
         
       if( scope == null )
-        this.serve_static()
+        scope = this.serve_static()
 
       response.on_screen(scope) 
+    }
+    
+    request.serve_static = function(){
+      try { // TODO: better way to do this?
+        var filename = picard.env.root + '/public' + this.uri.path
+        scope = { 
+          body: posix.cat(filename).wait(),
+          type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0])
+        }
+      } catch(e) {
+        scope = null
+      }
+      return scope
     }
     
     request.addListener('body', request.extract_form_params)
