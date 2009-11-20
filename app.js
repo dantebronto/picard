@@ -21,12 +21,9 @@ get('/haml', function(req){
 get('/json', function(req){
   return {
     type: 'application/json',
-    body: JSON.stringify(
-      [ 
-        { command_1: 'make it so' },
-        { command_2: 'you have the bridge'}
-      ]
-    )
+    body: JSON.stringify( 
+      [ { command_1: 'make it so' },
+        { command_2: 'you have the bridge'} ] )
   }
 })
 
@@ -40,4 +37,12 @@ get('/', function(req){
 
 get('/redirect', function(req){
   return {  headers: { location: '/haml' }, status: 302 }
+})
+
+post('/post', function(req){
+  return { text: req.uri.params.foo }
+})
+
+post('/post/:id', function(req){
+  return { text: req.uri.params.id }
 })

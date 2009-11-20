@@ -3,7 +3,7 @@ var posix = require('posix')
 var routes = {
   engage: function(request, response){
   
-    request.extract_params = function(route, match_data){
+    request.extract_route_params = function(route, match_data){
       var param_keys = route.match(/:[^/]*/g)
       if(param_keys){
         for(var i=0; i < param_keys.length; i++){
@@ -24,7 +24,32 @@ var routes = {
         scope = null
       }
     }
-  
+    
+    request.extract_form_params = function(chunk){
+      var chunks = chunk.split('&')
+      for(var i in chunks){
+        var k_v = chunks[i].split('=')
+        this.uri.params[k_v[0]] = k_v[1]
+      }
+    }
+     
+    request.handle_route_by_type = function(response){
+      var scope = null
+      
+      if ( this.method == "GET" )
+        scope = routes.handle_get(this)
+      else if ( request.method == "POST" )
+        scope = routes.handle_post(this)
+        
+      if( scope == null )
+        this.serve_static()
+
+      response.on_screen(scope) 
+    }
+    
+    request.addListener('body', request.extract_form_params)
+    request.addListener('complete', function(){ request.handle_route_by_type(response) })
+    
     response.on_screen = function(scope){
       var self = this
     
@@ -55,27 +80,30 @@ var routes = {
         self.finish()
       }  
     }
-  
-    var scope = null;
-  
-    if(request.method == "GET")
-      scope = routes.handle_get(request)
-    
-    if( scope == null )
-      request.serve_static()
-      
-    response.on_screen(scope)
   },
+  
   handle_get: function(request){
     for(var route in get_routes){
       var match_data = routes.match(request.uri.path, route)
       
       if(match_data){ // incoming request matches route
-        request.extract_params(route, match_data)
+        request.extract_route_params(route, match_data)
         return get_routes[route](request)
       }
     }
   },
+  
+  handle_post: function(request){
+    for(var route in post_routes){
+      var match_data = routes.match(request.uri.path, route)
+      
+      if(match_data){ // incoming request matches route
+        request.extract_route_params(route, match_data)
+        return post_routes[route](request)
+      }
+    }
+  },
+  
   match: function(path, route){
     var full_route = '^'+route+'$'
     var regexp = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
@@ -84,9 +112,13 @@ var routes = {
 }
 
 var get_routes = {}
+var post_routes = {}
 
 GLOBAL.get = function(path, handler){
   get_routes[path] = handler
+}
+GLOBAL.post = function(path, handler){
+  post_routes[path] = handler
 }
 
 exports.engage = routes.engage
