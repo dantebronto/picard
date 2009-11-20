@@ -1,10 +1,10 @@
 require('./config/env')
 
-get('/order', function(req){
-  return { text: "<h1>Tea, Earl Grey, hot.</h1>" }
+get('/', function(){
+  return { text: 'Hello Universe' }
 })
 
-get('/haml', function(req){
+get('/haml', function(){
   var scope = {
     template: 'index.haml', 
     print_date: function () {
@@ -18,31 +18,33 @@ get('/haml', function(req){
   return scope;
 })
 
-get('/json', function(req){
+get('/json', function(){
   return {
     type: 'application/json',
     body: JSON.stringify( 
-      [ { command_1: 'make it so' },
-        { command_2: 'you have the bridge'} ] )
+      [ { command_1: 'Make it so' },
+        { command_2: 'You have the bridge, Number One' } ] )
   }
 })
 
-get('/name/:first/:last/?', function(req){
-  return { text: "<h1>Hello " + req.uri.params.first + " " + req.uri.params.last + "</h1>" }
-})
-
-get('/', function(req){
-  return { text: 'hello world' }
-})
-
-get('/redirect', function(req){
+get('/redirect', function(){
   return {  headers: { location: '/haml' }, status: 302 }
 })
 
-post('/post', function(req){
-  return { text: req.uri.params.foo }
+post('/order', function(){
+  return { text: 'Tea, Earl Grey, Hot' }
 })
 
-post('/post/:id', function(req){
-  return { text: req.uri.params.id }
+put('/weapon/:id', function(params){
+  return { text: '<p>Phaser with id #' + params.id + ' set to stun</p>' }
+})
+
+del('/fire/:number', function(params){
+  
+  var text = '<p>Borg cube destroyed using ' + params.number + ' photon torpedoes</p>'
+  
+  if (  Number(params.number) > 12 )
+    text = '<h1>Maximum Yield, Full Spread!</h1>'
+    
+  return { text: text }
 })

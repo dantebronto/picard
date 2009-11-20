@@ -2,17 +2,7 @@ var posix = require('posix')
 
 var routes = {
   engage: function(request, response){
-  
-    request.extract_route_params = function(route, match_data){
-      var param_keys = route.match(/:[^/]*/g)
-      if(param_keys){
-        for(var i=0; i < param_keys.length; i++){
-          var key = param_keys[i].replace(':', '')
-          this.uri.params[key] = match_data[i+1]
-        }
-      }
-    }
-  
+    
     request.serve_static = function(){
       try {
         var filename = picard.env.root + '/public' + this.uri.path
@@ -29,17 +19,24 @@ var routes = {
       var chunks = chunk.split('&')
       for(var i in chunks){
         var k_v = chunks[i].split('=')
-        this.uri.params[k_v[0]] = k_v[1]
+        this[k_v[0]] = k_v[1]
       }
     }
-     
-    request.handle_route_by_type = function(response){
+    
+    request.extract_route_params = function(route, match_data){
+      var param_keys = route.match(/:[^/]*/g)
+      if(param_keys){
+        for(var i=0; i < param_keys.length; i++){
+          var key = param_keys[i].replace(':', '')
+          this[key] = match_data[i+1]
+        }
+      }
+    }
+    
+    request.resolve = function(response){
       var scope = null
       
-      if ( this.method == "GET" )
-        scope = routes.handle_get(this)
-      else if ( request.method == "POST" )
-        scope = routes.handle_post(this)
+      scope = routes.handle(this, request.method)
         
       if( scope == null )
         this.serve_static()
@@ -48,7 +45,7 @@ var routes = {
     }
     
     request.addListener('body', request.extract_form_params)
-    request.addListener('complete', function(){ request.handle_route_by_type(response) })
+    request.addListener('complete', function(){ request.resolve(response) })
     
     response.on_screen = function(scope){
       var self = this
@@ -82,24 +79,29 @@ var routes = {
     }
   },
   
-  handle_get: function(request){
-    for(var route in get_routes){
-      var match_data = routes.match(request.uri.path, route)
+  handle: function(request, method){
+    var route_array = []
+    
+    if(method == "GET")
+      route_array = get_routes
+    else if(method == "POST"){
+      route_array = post_routes
       
-      if(match_data){ // incoming request matches route
-        request.extract_route_params(route, match_data)
-        return get_routes[route](request)
+      var rest_method = request._method
+      
+      if( rest_method == 'put' )
+        route_array = put_routes
+      else if ( rest_method == 'delete' ){
+        route_array = delete_routes
       }
     }
-  },
-  
-  handle_post: function(request){
-    for(var route in post_routes){
+    
+    for(var route in route_array){
       var match_data = routes.match(request.uri.path, route)
       
       if(match_data){ // incoming request matches route
         request.extract_route_params(route, match_data)
-        return post_routes[route](request)
+        return route_array[route](request)
       }
     }
   },
@@ -113,12 +115,20 @@ var routes = {
 
 var get_routes = {}
 var post_routes = {}
+var put_routes = {}
+var delete_routes = {}
 
 GLOBAL.get = function(path, handler){
   get_routes[path] = handler
 }
 GLOBAL.post = function(path, handler){
   post_routes[path] = handler
+}
+GLOBAL.put = function(path, handler){
+  put_routes[path] = handler
+}
+GLOBAL.del = function(path, handler){
+  delete_routes[path] = handler
 }
 
 exports.engage = routes.engage
