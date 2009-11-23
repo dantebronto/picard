@@ -49,7 +49,7 @@ post('/order', function(){
 
 // curl -d "foo=bar&baz_bat" http://localhost:9900/with_params
 post('/with_params', function(params){
-  return { text: '<h1>' + params.foo + ' ' + params.baz + '</h1>' } // should render 'bar'
+  return { text: '<h1>' + params.foo + ' ' + params.baz + '</h1>' }
 })
 
 put('/weapon/:id', function(params){
