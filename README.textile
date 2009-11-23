@@ -8,7 +8,7 @@ p. Picard uses Haml thanks to creationix's haml-js project.
 
 p. A sample application:
 
-pre.
+<pre>
 
 require('./config/env')
 
@@ -65,3 +65,5 @@ del('/fire/:number', function(params){
     
   return { text: text }
 })
+
+</pre>
