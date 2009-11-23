@@ -1,4 +1,5 @@
 var posix = require('posix')
+var haml = require('./haml')
 
 var routes = {
   engage: function(request, response){
@@ -54,23 +55,19 @@ var routes = {
     
       if ( scope == null )
         scope = { status: 404, body: "<h1> 404 Not Found </h1>" }
-    
-      var response = scope.response
-      var status = scope.status || 200
+        
       var body = scope.text || scope.body || ''
-      var type = scope.type || "text/html"
-      var template = scope.template || null
       var headers = scope.headers || {}
-    
+      
       if(typeof(scope) == 'string')
         body = scope
     
-      headers['Content-Type'] = type
-      self.sendHeader(status, headers)
+      headers['Content-Type'] = scope.type || "text/html"
+      self.sendHeader(scope.status || 200, headers)
     
-      if(template){
-        template = picard.env.root + '/views/' + template
-        require('./haml').render(scope, template, function(body){
+      if(scope.template){
+        var template_path = picard.env.root + '/views/' + scope.template
+        haml.render(scope, template_path, function(body){
           self.sendBody(body)
           self.finish()
         })
