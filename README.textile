@@ -1,4 +1,4 @@
-h3. Picard: A Micro-framework for NodeJS
+h3. Picard: A Micro-framework for node.js
 
 p. If you want to check it out, install "Node":http://nodejs.org and start the sample app with `node app.js`. There are no other dependencies. 
 
@@ -67,3 +67,5 @@ del('/fire/:number', function(params){
 })
 
 </pre>
+
+p. Picard was built against node.js v0.1.18
