@@ -35,7 +35,7 @@ post('/order', function(){
   return { text: 'Tea, Earl Grey, Hot' }
 })
 
-// curl -d "foo=bar&baz_bat" http://localhost:9900/with_params
+// curl -d "foo=bar&baz=bat" http://localhost:9900/with_params
 post('/with_params', function(params){
   return { text: '<h1>' + params.foo + ' ' + params.baz + '</h1>' }
 })

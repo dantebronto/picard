@@ -82,3 +82,25 @@ describe 'DELETE' do
   end
   
 end
+
+describe 'static assets' do
+  
+  it 'should serve html' do
+    res = Curl::Easy.perform(base_url + '/index.html')
+    res.body_str.should include('<h1>this is static content!</h1>')
+    res.header_str.should include('text/html')
+  end
+  
+  it 'should serve css' do
+    res = Curl::Easy.perform(base_url + '/style.css')
+    res.body_str.should include('body { background-color: black; color: #CCC; }')
+    res.header_str.should include('text/css')
+  end
+  
+  it 'should serve js' do
+    res = Curl::Easy.perform(base_url + '/static.js')
+    res.body_str.should include('alert')
+    res.header_str.should include('application/javascript')
+  end
+  
+end
