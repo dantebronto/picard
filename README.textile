@@ -99,14 +99,14 @@ Finished in 0.083371 seconds
 Finished in 0.112633 seconds
 Finished in 0.083442 seconds
 Finished in 0.083424 seconds
-Finished in 0.0826440000000001 seconds
+Finished in 0.082644 seconds
 Finished in 0.083286 seconds
 Finished in 0.084136 seconds
 Finished in 0.113771 seconds
 Finished in 0.08323 seconds
 Average time was 0.0893085 seconds
 
-Running Node specs 10 times:
+Running Picard specs 10 times:
 
 Finished in 0.040487 seconds
 Finished in 0.040587 seconds
@@ -120,7 +120,7 @@ Finished in 0.040797 seconds
 Finished in 0.041551 seconds
 Average time was 0.0409034 seconds
 
-Node was 2.18 times faster!
+Picard was 2.18 times faster!
 </pre>
 
 p. Specs: MacBook Pro 2 x 2.53 GHz, 4 GB RAM, Ruby v1.8.7 on Thin 1.2.5, node.js v0.1.18

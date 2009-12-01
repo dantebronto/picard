@@ -24,7 +24,7 @@ end
 
 puts "Average time was #{sin_sum / 10.0} seconds"
 
-puts "\nRunning Node specs 10 times:\n\n"
+puts "\nRunning Picard specs 10 times:\n\n"
 node_sum = 0
 10.times do 
   out = `cd ../sample_app; rake | grep Finished`
@@ -35,5 +35,5 @@ end
 puts "Average time was #{node_sum / 10.0} seconds"
 
 if node_sum < sin_sum
-  puts "\nNode was #{ sprintf("%.2f", (sin_sum / node_sum)) } times faster!"
+  puts "\nPicard was #{ sprintf("%.2f", (sin_sum / node_sum)) } times faster!"
 end
