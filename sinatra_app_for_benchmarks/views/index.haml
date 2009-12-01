@@ -1,0 +1,20 @@
+!!! XML
+!!! strict
+%html{ :xmlns => "http://www.w3.org/1999/xhtml" }
+  %head
+    %title
+      Sample haml template
+  %body
+    .profile
+      .left.column{ :id => 'this_is_an_id' }
+        
+        #date 
+          Stardate: 
+          =print_date
+      .right.column
+        #name 
+          Name: 
+          =@current_user.name
+        #title 
+          Title: 
+          =@current_user.bio
