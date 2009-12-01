@@ -19,7 +19,7 @@ get('/haml', function(){
       bio: "Captain of the USS Enterprise"
     }
   };
-  return scope;
+  return scope
 })
 
 get('/json', function(){
@@ -39,7 +39,7 @@ post('/order', function(){
   return { text: 'Tea, Earl Grey, Hot' }
 })
 
-// curl -d "foo=bar&baz=bat" http://localhost:9900/with_params
+// simulate form params with `curl -d "foo=bar&baz=bat" http://localhost:9900/with_params`
 post('/with_params', function(params){
   return { text: '<h1>' + params.foo + ' ' + params.baz + '</h1>' }
 })
@@ -64,4 +64,8 @@ get(/\/regex\/(.*)\/(.*)/, function(params){
 
 get(/\/selective\/(\d+)/, function(params){ // must be a number
   return { text: params.captures[0] }
+})
+
+get('/this_will_fail', function(){
+  foo.bar // foo is undefined
 })

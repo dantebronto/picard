@@ -61,6 +61,12 @@ describe 'GET' do
     res.header_str.should include('404')
   end
 
+  it 'should handle exceptions' do
+    res = Curl::Easy.perform(base_url + '/this_will_fail')
+    res.header_str.should include('500')
+    res.body_str.should include("<h3>foo is not defined</h3>")
+  end
+
 end
 
 describe 'POST' do

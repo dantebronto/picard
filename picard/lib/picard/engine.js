@@ -1,8 +1,9 @@
 var posix = require('posix')
+var sys = require('sys')
 var haml = require('./haml')
 
 var routes = {
-  engage: function(request, response){
+  engage: function(request, response){ // wraps request/response functions
     
     request.extract_form_params = function(chunk){
       if( chunk == undefined ) { return }
@@ -21,10 +22,9 @@ var routes = {
         this[route.keys[i]] = match_data[i]
         match_data.splice(i,1)
       }
-
-      for(var i=0; i < match_data.length; i++){
+      
+      for(var i=0; i < match_data.length; i++)
         this.captures[i] = match_data[i]
-      }
     }
     
     request.resolve = function(response){
@@ -80,7 +80,24 @@ var routes = {
         self.finish()
       }  
     }
+    
+    request.handle_exception = function(ex) {
+      sys.puts('')
+      sys.puts(ex.message)
+      sys.puts(ex.stack)
+
+      var body = '<h1> 500 Error </h1>'
+      body += '<h3>' + ex.message + '</h3>'
+      body += '<pre>' + ex.stack + '</pre>'
+
+      response.sendHeader(500, { 'Content-Type': 'text/html' });
+      response.sendBody(body);
+      response.finish();
+    }
+    
   },
+  
+  // begin route methods
   
   execute_callback: function(request){
     var routes_for_rest_type = routes.rest_type(request)
@@ -91,7 +108,11 @@ var routes = {
       
       if( matches ){ // incoming request matches route
         request.extract_route_params(route, matches)
-        return route.handler(request)
+        try {
+          return route.handler(request)
+        } catch(ex) {
+          request.handle_exception(ex)
+        }
       }
     }
   },
@@ -159,8 +180,7 @@ picard.mime = {
   lookup_extension : function(ext) {
     return picard.mime.TYPES[ext.toLowerCase()];
   },
-  // List of most common mime-types, stolen from Rack.
-  TYPES : 
+  TYPES : // List of most common mime-types, stolen from Rack.
     { ".3gp" : "video/3gpp"
     , ".a" : "application/octet-stream"
     , ".ai" : "application/postscript"
