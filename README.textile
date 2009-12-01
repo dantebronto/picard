@@ -1,4 +1,4 @@
-h3. Picard: A Micro-framework for node.js
+h1. Picard: A Micro-framework for node.js
 
 p. If you want to check it out, install "Node":http://nodejs.org and start the sample app with `node app.js`. There are no other dependencies. 
 
@@ -84,9 +84,9 @@ p. A sample application:
 
 </pre>
 
-h5. Benchmarks
+h3. Benchmarks
 
-p. The sinatra_app_for_benchmarks is a Ruby port of the node sample_app. According to these benchmarks, the node app runs about twice as fast as the Sinatra app on Thin. Below is a sample output of the included benchmark script:
+p. The included sinatra_app_for_benchmarks is a Ruby port of the node.js sample_app. According to these benchmarks, the node.js app runs about twice as fast as the Sinatra app on Thin. Below is a sample output of the benchmark script:
 
 <pre>
 $ cd sinatra_app_for_benchmarks
