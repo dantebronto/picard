@@ -171,20 +171,6 @@ h4. Apache Benchmark Test for Picard app:
 <pre>
 $ ab -n 1000 -c 10 http://127.0.0.1:9900/haml
 
-Benchmarking 127.0.0.1 (be patient)
-Completed 100 requests
-Completed 200 requests
-Completed 300 requests
-Completed 400 requests
-Completed 500 requests
-Completed 600 requests
-Completed 700 requests
-Completed 800 requests
-Completed 900 requests
-Completed 1000 requests
-Finished 1000 requests
-
-
 Server Software:        
 Server Hostname:        127.0.0.1
 Server Port:            9900
