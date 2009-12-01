@@ -4,6 +4,10 @@ get('/', function(){
   return { text: 'Hello Universe' }
 })
 
+get('/foo/:bar', function(params){
+  return { text: params.bar }
+})
+
 get('/haml', function(){
   var scope = {
     template: 'index.haml', 
@@ -39,11 +43,11 @@ post('/order', function(){
 post('/with_params', function(params){
   return { text: '<h1>' + params.foo + ' ' + params.baz + '</h1>' }
 })
-
+ 
 put('/weapon/:id', function(params){
   return { text: '<p>Phaser with id #' + params.id + ' set to stun</p>' }
 })
-
+ 
 del('/fire/:number', function(params){
   
   var text = '<p>Borg cube destroyed using ' + params.number + ' photon torpedoes</p>'
@@ -52,4 +56,12 @@ del('/fire/:number', function(params){
     text = '<h1>Maximum yield, full spread!</h1>'
     
   return { text: text }
+})
+
+get(/\/regex\/(.*)\/(.*)/, function(params){
+  return { text: params.captures[0] + ' ' + params.captures[1] }
+})
+
+get(/\/selective\/(\d+)/, function(params){ // must be a number
+  return { text: params.captures[0] }
 })

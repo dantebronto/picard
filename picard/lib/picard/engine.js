@@ -14,12 +14,16 @@ var routes = {
     }
     
     request.extract_route_params = function(route, match_data){
-      var param_keys = route.match(/:[^/]*/g)
-      if(param_keys){
-        for(var i=0; i < param_keys.length; i++){
-          var key = param_keys[i].replace(':', '')
-          this[key] = match_data[i+1]
-        }
+      if( match_data == null ){ return } else { match_data.shift() }
+      this.captures = []
+      
+      for(var i=0; i < route.keys.length; i++){
+        this[route.keys[i]] = match_data[i]
+        match_data.splice(i,1)
+      }
+
+      for(var i=0; i < match_data.length; i++){
+        this.captures[i] = match_data[i]
       }
     }
     
@@ -79,20 +83,21 @@ var routes = {
   },
   
   execute_callback: function(request){
-    var rest_type = routes.rest_type(request)
-    
-    for(var route in route_array){
-      var matches = routes.match(request.uri.path, route)
+    var routes_for_rest_type = routes.rest_type(request)
+
+    for(var i=0; i < routes_for_rest_type.length; i++){
+      var route = routes_for_rest_type[i]
+      var matches = request.uri.path.match(route.path)
       
       if( matches ){ // incoming request matches route
         request.extract_route_params(route, matches)
-        return rest_type[route](request)
+        return route.handler(request)
       }
     }
   },
 
   rest_type: function(request){
-    route_array = []
+    var route_array = []
     if(request.method == "GET")
       route_array = get_routes
     else if(request.method == "POST"){
@@ -102,36 +107,50 @@ var routes = {
       
       if( rest_method == 'put' )
         route_array = put_routes
-      else if ( rest_method == 'delete' ){
+      else if ( rest_method == 'delete' )
         route_array = delete_routes
-      }
     }
     return route_array
   },
-
-  match: function(path, route){
-    var full_route = '^'+route+'$'
-    var regexp = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
-    return path.match(regexp)
+  
+  add: function(path, handler){
+    var keys = []
+    
+    if(path.constructor != RegExp){ // assume to be a String
+      var full_route = '^'+path+'$'
+      var param_keys = path.match(/:[^/]*/g)
+      path = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
+      
+      if(param_keys)
+        for(var i=0; i < param_keys.length; i++)
+          keys[keys.length] = param_keys[i].replace(':', '')
+    }
+    
+    return {
+      path: path,
+      handler: handler,
+      keys: keys 
+    } 
   }
+  
 }
 
-var get_routes = {}
-var post_routes = {}
-var put_routes = {}
-var delete_routes = {}
+var get_routes = []
+var post_routes = []
+var put_routes = []
+var delete_routes = []
 
 GLOBAL.get = function(path, handler){
-  get_routes[path] = handler
+  get_routes[get_routes.length] = routes.add(path, handler)
 }
 GLOBAL.post = function(path, handler){
-  post_routes[path] = handler
+  post_routes[post_routes.length] = routes.add(path, handler)
 }
 GLOBAL.put = function(path, handler){
-  put_routes[path] = handler
+  put_routes[put_routes.length] = routes.add(path, handler)
 }
 GLOBAL.del = function(path, handler){
-  delete_routes[path] = handler
+  delete_routes[delete_routes.length] = routes.add(path, handler)
 }
 
 exports.engage = routes.engage

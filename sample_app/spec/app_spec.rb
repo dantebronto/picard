@@ -8,9 +8,15 @@ end
 
 describe 'GET' do
   
-  it 'should do normal get' do
+  it 'should do gets' do
     res = Curl::Easy.perform(base_url + '/')
     res.body_str.should == "Hello Universe"
+    res.header_str.should include('200')
+  end
+
+  it 'should do gets with normal params' do
+    res = Curl::Easy.perform(base_url + '/foo/bar')
+    res.body_str.should == "bar"
     res.header_str.should include('200')
   end
   
@@ -40,6 +46,21 @@ describe 'GET' do
     res.body_str.should include('Name: Jean-Luc Picard')
   end
   
+  it 'should allow regular expressions' do
+    res = Curl::Easy.perform(base_url + '/regex/this/that')
+    res.header_str.should include('200')
+    res.body_str.should eql("this that")
+  end
+
+  it 'should enforce selective regular expressions' do
+    res = Curl::Easy.perform(base_url + '/selective/555')
+    res.header_str.should include('200')
+    res.body_str.should eql("555")
+    
+    res = Curl::Easy.perform(base_url + '/selective/ZZZ')
+    res.header_str.should include('404')
+  end
+
 end
 
 describe 'POST' do
