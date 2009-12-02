@@ -16,10 +16,6 @@ p. A sample application:
     return { text: 'Hello Universe' }
   })
 
-  get('/foo/:bar', function(params){
-    return { text: params.bar }
-  })
-
   get('/haml', function(){
     var scope = {
       template: 'index.haml', 
@@ -41,10 +37,6 @@ p. A sample application:
         [ { command_1: 'Make it so' },
           { command_2: 'You have the bridge, Number One' } ] )
     }
-  })
-
-  get('/redirect', function(){
-    return {  headers: { location: '/haml' }, status: 302 }
   })
 
   post('/order', function(){
@@ -74,19 +66,13 @@ p. A sample application:
     return { text: params.captures[0] + ' ' + params.captures[1] }
   })
 
-  get(/\/selective\/(\d+)/, function(params){ // must be a number
-    return { text: params.captures[0] }
-  })
-
-  get('/this_will_fail', function(){
-    foo.bar // foo is undefined
-  })
-
 </pre>
+
+p. See the sample app for more examples, including how to handle asynchronous processing.
 
 h3. Benchmarks
 
-p. The included sinatra_app_for_benchmarks is a Ruby port of the node.js sample_app. According to these benchmarks, the node.js app runs about twice as fast as the Sinatra app on Thin. Below is a sample output of the benchmark script:
+p. The included sinatra_app_for_benchmarks is a Ruby port of the Picard sample_app. According to these benchmarks, the Picard app on node.js runs about twice as fast as the Sinatra app on Thin and can handle around 12x as many requests per second (due to the asynchronous nature of node.js). Below is a sample output of the benchmarks:
 
 <pre>
 $ cd sinatra_app_for_benchmarks
@@ -126,89 +112,91 @@ Picard was 2.18 times faster!
 h4. Apache Benchmark Test for Sinatra app:
 
 <pre>
-$ ab -n 1000 -c 10 http://127.0.0.1:3000/haml
+  $ ab -n 1000 -c 10 http://127.0.0.1:3000/haml
 
-Server Software:        thin
-Server Hostname:        127.0.0.1
-Server Port:            3000
+  Server Software:        thin
+  Server Hostname:        127.0.0.1
+  Server Port:            3000
 
-Document Path:          /haml
-Document Length:        697 bytes
+  Document Path:          /haml
+  Document Length:        697 bytes
 
-Concurrency Level:      10
-Time taken for tests:   10.570 seconds
-Complete requests:      1000
-Failed requests:        0
-Write errors:           0
-Total transferred:      835000 bytes
-HTML transferred:       697000 bytes
-Requests per second:    94.61 [#/sec] (mean)
-Time per request:       105.696 [ms] (mean)
-Time per request:       10.570 [ms] (mean, across all concurrent requests)
-Transfer rate:          77.15 [Kbytes/sec] received
+  Concurrency Level:      10
+  Time taken for tests:   10.570 seconds
+  Complete requests:      1000
+  Failed requests:        0
+  Write errors:           0
+  Total transferred:      835000 bytes
+  HTML transferred:       697000 bytes
+  Requests per second:    94.61 [#/sec] (mean)
+  Time per request:       105.696 [ms] (mean)
+  Time per request:       10.570 [ms] (mean, across all concurrent requests)
+  Transfer rate:          77.15 [Kbytes/sec] received
 
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.3      0       3
-Processing:    11  105  19.4     96     202
-Waiting:       10   99  24.0     95     178
-Total:         11  106  19.4     97     202
+  Connection Times (ms)
+                min  mean[+/-sd] median   max
+  Connect:        0    0   0.3      0       3
+  Processing:    11  105  19.4     96     202
+  Waiting:       10   99  24.0     95     178
+  Total:         11  106  19.4     97     202
 
-Percentage of the requests served within a certain time (ms)
-  50%     97
-  66%    118
-  75%    120
-  80%    121
-  90%    125
-  95%    136
-  98%    144
-  99%    179
- 100%    202 (longest request)   
+  Percentage of the requests served within a certain time (ms)
+    50%     97
+    66%    118
+    75%    120
+    80%    121
+    90%    125
+    95%    136
+    98%    144
+    99%    179
+   100%    202 (longest request)   
 </pre>
 
 h4. Apache Benchmark Test for Picard app:
 
 <pre>
-$ ab -n 1000 -c 10 http://127.0.0.1:9900/haml
+  $ ab -n 1000 -c 10 http://127.0.0.1:9900/haml
 
-Server Software:        
-Server Hostname:        127.0.0.1
-Server Port:            9900
+  Server Software:        
+  Server Hostname:        127.0.0.1
+  Server Port:            9900
 
-Document Path:          /haml
-Document Length:        547 bytes
+  Document Path:          /haml
+  Document Length:        547 bytes
 
-Concurrency Level:      10
-Time taken for tests:   0.880 seconds
-Complete requests:      1000
-Failed requests:        0
-Write errors:           0
-Total transferred:      638638 bytes
-HTML transferred:       547547 bytes
-Requests per second:    1136.19 [#/sec] (mean)
-Time per request:       8.801 [ms] (mean)
-Time per request:       0.880 [ms] (mean, across all concurrent requests)
-Transfer rate:          708.60 [Kbytes/sec] received
+  Concurrency Level:      10
+  Time taken for tests:   0.880 seconds
+  Complete requests:      1000
+  Failed requests:        0
+  Write errors:           0
+  Total transferred:      638638 bytes
+  HTML transferred:       547547 bytes
+  Requests per second:    1136.19 [#/sec] (mean)
+  Time per request:       8.801 [ms] (mean)
+  Time per request:       0.880 [ms] (mean, across all concurrent requests)
+  Transfer rate:          708.60 [Kbytes/sec] received
 
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.4      0       3
-Processing:     4    8   5.0      8      51
-Waiting:        1    6   5.2      6      50
-Total:          5    9   5.0      8      51
+  Connection Times (ms)
+                min  mean[+/-sd] median   max
+  Connect:        0    0   0.4      0       3
+  Processing:     4    8   5.0      8      51
+  Waiting:        1    6   5.2      6      50
+  Total:          5    9   5.0      8      51
 
-Percentage of the requests served within a certain time (ms)
-  50%      8
-  66%      8
-  75%      9
-  80%      9
-  90%     10
-  95%     11
-  98%     26
-  99%     50
- 100%     51 (longest request)
+  Percentage of the requests served within a certain time (ms)
+    50%      8
+    66%      8
+    75%      9
+    80%      9
+    90%     10
+    95%     11
+    98%     26
+    99%     50
+   100%     51 (longest request)
 </pre>
 
-p. 1136.19 requests per second for Picard verses 94.61 for Sinatra
+p. 1136.19 requests per second for Picard verses 94.61 for Sinatra!
 
 p. Specs: MacBook Pro 2 x 2.53 GHz, 4 GB RAM, Ruby v1.8.7 on Thin 1.2.5, node.js v0.1.18
+
+p. Note: The Sinatra app is not event driven, so to be fair I should really be testing Picard verses Sinatra + EventMachine. However, this illustrates the fact that node.js is evented out of the box, and obviates the need for separate libraries like EventMachine.

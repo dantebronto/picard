@@ -31,11 +31,14 @@ var routes = {
       var scope = null
       
       scope = routes.execute_callback(this)
-        
+      
+      if( scope == 'async' )
+        return
+      
       if( scope == null )
         scope = this.serve_static()
 
-      response.on_screen(scope) 
+      this.on_screen(scope) 
     }
     
     request.serve_static = function(){
@@ -50,11 +53,8 @@ var routes = {
       }
       return scope
     }
-    
-    request.addListener('body', request.extract_form_params)
-    request.addListener('complete', function(){ request.resolve(response) })
-    
-    response.on_screen = function(scope){
+        
+    request.on_screen = function(scope){
       var self = this
     
       if ( scope == null )
@@ -67,17 +67,17 @@ var routes = {
         body = scope
     
       headers['Content-Type'] = scope.type || "text/html"
-      self.sendHeader(scope.status || 200, headers)
+      response.sendHeader(scope.status || 200, headers)
     
       if(scope.template){
         var template_path = picard.env.root + '/views/' + scope.template
         haml.render(scope, template_path, function(body){
-          self.sendBody(body)
-          self.finish()
+          response.sendBody(body)
+          response.finish()
         })
       } else {
-        self.sendBody(body)
-        self.finish()
+        response.sendBody(body)
+        response.finish()
       }  
     }
     
@@ -95,13 +95,16 @@ var routes = {
       response.finish();
     }
     
+    request.addListener('body', request.extract_form_params)
+    request.addListener('complete', function(){ request.resolve(response) })
+    
   },
   
   // begin route methods
   
   execute_callback: function(request){
     var routes_for_rest_type = routes.rest_type(request)
-
+    
     for(var i=0; i < routes_for_rest_type.length; i++){
       var route = routes_for_rest_type[i]
       var matches = request.uri.path.match(route.path)
