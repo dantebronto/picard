@@ -43,7 +43,7 @@ var routes = {
     
     request.serve_static = function(){
       try { // TODO: better way to do this?
-        var filename = picard.env.root + '/public' + this.uri.path
+        var filename = picard.env.root + picard.env.public + this.uri.path
         scope = { 
           body: posix.cat(filename).wait(),
           type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0])
@@ -70,7 +70,7 @@ var routes = {
       response.sendHeader(scope.status || 200, headers)
     
       if(scope.template){
-        var template_path = picard.env.root + '/views/' + scope.template
+        var template_path = picard.env.root + picard.env.views + '/' + scope.template
         haml.render(scope, template_path, function(body){
           response.sendBody(body)
           response.finish()
