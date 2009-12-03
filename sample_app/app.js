@@ -70,17 +70,16 @@ get('/this_will_fail', function(){
   foo.bar // foo is undefined
 })
 
-// Below we make a GET request to Google.
+// Below we make a GET request to /haml (to simulate an http service call).
 // Rather than block other processing while waiting for a response,
-// we add callbacks on the request and return simply 'async'.
-
+// we attach event listeners to the request without returning a value from our callback.
 // Only when the GET has returned do we render the result via the 'on_screen' method.
 
 get('/async_example', function(params){
   
   // This could easily be a call to CouchDB or other service
-  var google = require('http').createClient(80, "www.google.com")
-  var request = google.get("/", { "host": "www.google.com" })
+  var google = require('http').createClient(9900, "localhost")
+  var request = google.get("/haml", { "host": "localhost" })
   
   request.finish(function(response) {
     var body = ''
@@ -95,6 +94,4 @@ get('/async_example', function(params){
       params.on_screen({ body: body })
     })
   })
-  
-  return 'async' // tell Picard not to call to on_screen, we will
 })
