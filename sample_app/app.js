@@ -78,8 +78,8 @@ get('/this_will_fail', function(){
 get('/async_example', function(params){
   
   // This could easily be a call to CouchDB or other service
-  var google = require('http').createClient(9900, "localhost")
-  var request = google.get("/haml", { "host": "localhost" })
+  var local = require('http').createClient(9900, "localhost")
+  var request = local.get("/haml", { "host": "localhost" })
   
   request.finish(function(response) {
     var body = ''

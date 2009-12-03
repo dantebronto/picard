@@ -55,21 +55,19 @@ var request_extensions = {
       
   on_screen: function(scope){
     var res = this.response
-
+    
     if ( scope == null )
       scope = { status: 404, body: "<h1> 404 Not Found </h1>" }
       
     var body = scope.text || scope.body || ''
     var headers = scope.headers || {}
+    var status = scope.status || 200
     
     if(typeof(scope) == 'string')
       body = scope
   
     headers['Content-Type'] = scope.type || "text/html"
-    res.sendHeader(scope.status || 200, headers)
-
-    sys.puts('') // show params
-    sys.puts(sys.inspect(this))  
+    res.sendHeader(status, headers)
     
     if(scope.template){
       var template_path = picard.env.root + picard.env.views + '/' + scope.template
@@ -80,22 +78,23 @@ var request_extensions = {
     } else {
       res.sendBody(body)
       res.finish()
-    }  
+    }
+      
+    if ( status != 404 ) // show params
+      sys.puts('\n' + (this._method || this.method).toUpperCase() + ' ' + 
+      this.uri.path + ' ' + status + '\n' + sys.inspect(this))
   },
   
   handle_exception: function(ex) {
-    sys.puts('')
-    sys.puts(ex.message)
-    sys.puts(ex.stack)
-
-    var body = '<h1> 500 Error </h1>'
-    body += '<h3>' + ex.message + '</h3>'
-    body += '<pre>' + ex.stack + '</pre>'
-
-    this.response.sendHeader(500, { 'Content-Type': 'text/html' });
-    this.response.sendBody(body);
-    this.response.finish();
+    this.on_screen({ 
+      status: 500, 
+      body: '<h1> 500 Error </h1>' +
+        '<h3>' + ex.message + '</h3>' +
+        '<pre>' + ex.stack + '</pre>' 
+    })    
+    sys.puts('\n' + ex.message + '\n' + ex.stack)
   }
+  
 }
 
 exports.get_extensions = function(){ return request_extensions }
