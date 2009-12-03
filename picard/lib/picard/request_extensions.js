@@ -27,6 +27,7 @@ var request_extensions = {
   },
   
   resolve: function(){
+    this.parse_cookies()
     var scope = picard.routes.execute_callback(this)
     
     if( scope == 'static' )
@@ -69,7 +70,10 @@ var request_extensions = {
     if(typeof(scope) == 'string')
       body = scope
   
-    headers['Content-Type'] = scope.type || "text/html"
+    headers['content-type'] = scope.type || "text/html"
+    headers = this.format_headers(headers)
+    headers = this.set_cookies(headers)
+    
     res.sendHeader(status, headers)
     
     if(scope.template){
@@ -97,6 +101,65 @@ var request_extensions = {
         '<pre>' + ex.stack + '</pre>'
     })    
     sys.puts('\n' + ex.message + '\n' + ex.stack)
+  },
+  
+  cookie: function(name, val, options){
+    if ( val === undefined )
+      return this.cookies[name]
+    
+    options = options || {}
+    options.value = val
+    options.path = options.path || "/"
+    
+    this.cookies[name] = options
+  },
+  
+  set_cookies: function(headers){
+    var ret, name, options
+    
+    for (name in this.cookies) {
+      ret = []
+      
+      ret.push(name, "=", this.cookies[name].value)
+      
+      options = this.cookies[name]
+      
+      if (options.expires)
+        ret.push("; expires=", options.expires.toUTCString())
+      
+      if (options.path)
+        ret.push("; path=", options.path)
+      
+      if (options.domain)
+        ret.push("; domain=", options.domain)
+      
+      if (options.secure)
+        ret.push("; secure")
+      
+      headers[headers.length] = [ "Set-Cookie", ret.join("") ]
+    }
+    return headers
+  },
+  
+  parse_cookies: function(){
+    var cookieHeader = this.headers["cookie"]
+    var cookies = {};
+    
+    if (cookieHeader){
+      cookieHeader.split(";").forEach(function(cookie){
+        var parts = cookie.split("=")
+        cookies[ parts[0].trim() ] = parts[1].trim()
+      })    
+    }
+    this.cookies = cookies
+  },
+  
+  format_headers: function(headers){ // make header object an array
+    var ara = []
+    for( var h in headers ){
+      ara[ara.length] = [ h, headers[h] ]
+    }
+    return ara
   }
   
 }

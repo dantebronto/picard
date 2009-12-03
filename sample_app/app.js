@@ -70,6 +70,25 @@ get('/this_will_fail', function(){
   foo.bar // foo is undefined
 })
 
+get('/cookie', function(request){
+
+  // a simple key-value cookie
+  request.cookie('hobby', 'literature')
+
+  // cookie with all options
+  var expires=new Date()
+  expires.setDate(expires.getDate()+30)
+  
+  request.cookie('user', 'LCDR Data', { 
+    domain: '.your_domain.org', 
+    path: '/cookie', 
+    expires: expires, 
+    secure: true 
+  })
+  
+  return { text: request.cookie('hobby').value } // will render 'literature'
+})
+
 // Below we make a GET request to /haml (to simulate an http service call).
 // Rather than block other processing while waiting for a response,
 // we attach event listeners to the request without returning a value from our callback.
