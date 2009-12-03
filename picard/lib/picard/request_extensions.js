@@ -27,38 +27,41 @@ var request_extensions = {
   },
   
   resolve: function(){
-    var scope = null
+    var scope = picard.routes.execute_callback(this)
     
-    scope = picard.routes.execute_callback(this)
-
     if( scope == 'static' )
       scope = this.serve_static()
-    else if ( scope == null || scope == 'async' )
+    if ( scope == null )
       return
-      
+
     this.on_screen(scope) 
   },
   
   serve_static: function(){
-    try { // TODO: better way to do this?
-      var filename = picard.env.root + picard.env.public + this.uri.path
-      var scope = { 
-        body: posix.cat(filename).wait(),
-        type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0])
+    var request = this
+    var filename = picard.env.root + picard.env.public + this.uri.path
+  
+    sys.exec("[ -f " + filename + " ] && echo '1' || echo '0'").addCallback(function(stdout){
+      if( stdout == 1 ){
+        posix.cat(filename).addCallback(function(content){
+          request.on_screen({ 
+            body: content, 
+            type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0]) 
+          })
+        }) 
+      } else { 
+        request.on_screen(null) 
       }
-    } catch(e) {
-      scope = null
-    }
-    
-    return scope
+    });
   },
-      
+  
   on_screen: function(scope){
+    if( this.response.finished ){ return }
     var res = this.response
     
     if ( scope == null )
       scope = { status: 404, body: "<h1> 404 Not Found </h1>" }
-      
+    
     var body = scope.text || scope.body || ''
     var headers = scope.headers || {}
     var status = scope.status || 200
@@ -79,10 +82,11 @@ var request_extensions = {
       res.sendBody(body)
       res.finish()
     }
-      
-    if ( status != 404 ) // show params
-      sys.puts('\n' + (this._method || this.method).toUpperCase() + ' ' + 
-      this.uri.path + ' ' + status + '\n' + sys.inspect(this))
+    
+    sys.puts('\n' + (this._method || this.method).toUpperCase() + ' ' + this.uri.path + ' ' + status)
+    
+    if(picard.env.mode == 'development')
+      sys.puts(sys.inspect(this)) // request params logging
   },
   
   handle_exception: function(ex) {
@@ -90,7 +94,7 @@ var request_extensions = {
       status: 500, 
       body: '<h1> 500 Error </h1>' +
         '<h3>' + ex.message + '</h3>' +
-        '<pre>' + ex.stack + '</pre>' 
+        '<pre>' + ex.stack + '</pre>'
     })    
     sys.puts('\n' + ex.message + '\n' + ex.stack)
   }
