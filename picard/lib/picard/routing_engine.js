@@ -3,7 +3,7 @@ var routes = {
   execute_callback: function(request){
     var routes_for_rest_type = routes.rest_type(request)
     
-    for(var i=0; i < routes_for_rest_type.length; i++){
+    for(var i=0, l = routes_for_rest_type.length; i < l; i++){
       var route = routes_for_rest_type[i]
       var matches = request.uri.path.match(route.path)
       
@@ -45,7 +45,7 @@ var routes = {
       path = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
       
       if(param_keys)
-        for(var i=0; i < param_keys.length; i++)
+        for(var i=0, l = param_keys.length; i < l; i++)
           keys[keys.length] = param_keys[i].replace(':', '')
     }
     

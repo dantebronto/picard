@@ -17,12 +17,12 @@ var request_extensions = {
     if( match_data == null ){ return } else { match_data.shift() }
     this.captures = []
     
-    for(var i=0; i < route.keys.length; i++){
+    for(var i=0, l = route.keys.length; i < l; i++){
       this[route.keys[i]] = match_data[i]
       match_data.splice(i,1)
     }
     
-    for(var i=0; i < match_data.length; i++)
+    for(var i=0, l = match_data.length; i < l; i++)
       this.captures[i] = match_data[i]
   },
   
@@ -117,7 +117,7 @@ var request_extensions = {
   set_cookies: function(headers){
     var ret, name, options
     
-    for (name in this.cookies) {
+    for(name in this.cookies) {
       if( this.cookies[name].preset ){ continue }
       options = this.cookies[name]
       ret = name + '=' + options.value
