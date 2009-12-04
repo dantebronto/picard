@@ -4,10 +4,17 @@ require('./picard/mime_types')
 
 picard.start = function() {
   require('http').createServer(function(request, response) {
+    
     process.mixin(request, req_ex.get_extensions())
     request.response = response
+    
     request.addListener('body', request.extract_form_params)
-    request.addListener('complete', request.resolve)
+    
+    request.addListener('complete', function(){
+      request.parse_cookies()
+      request.resolve()
+    })
+    
   }).listen(picard.env.port)
 
   require('sys').

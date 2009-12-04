@@ -21,16 +21,16 @@ var routes = {
 
   rest_type: function(request){
     var route_array = []
-    if(request.method == "GET")
+    if(request.method == 'GET')
       route_array = get_routes
-    else if(request.method == "POST"){
+    else if(request.method == 'POST'){
       route_array = post_routes
       
-      var rest_method = request._method
+      var rest_method = (request._method || '').toUpperCase()
       
-      if( rest_method == 'put' )
+      if( rest_method == 'PUT' )
         route_array = put_routes
-      else if ( rest_method == 'delete' )
+      else if ( rest_method == 'DELETE' )
         route_array = delete_routes
     }
     return route_array

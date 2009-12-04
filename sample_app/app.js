@@ -31,8 +31,8 @@ get('/json', function(){
   }
 })
 
-get('/redirect/?', function(){ // the '?' at the end of the route makes the trailing slash optional
-  return {  headers: { location: '/haml' }, status: 302 }
+get('/redirect/?', function(request){ // the '?' at the end of the route makes the trailing slash optional
+  return request.redirect('/haml')
 })
 
 post('/order', function(){
@@ -74,10 +74,10 @@ get('/cookie', function(request){
 
   // a simple key-value cookie
   request.cookie('hobby', 'literature')
-
+  
   // cookie with all options
   var expires=new Date()
-  expires.setDate(expires.getDate()+30)
+  expires.setDate(expires.getDate() + 30)
   
   request.cookie('user', 'LCDR Data', { 
     domain: '.your_domain.org', 
@@ -86,7 +86,7 @@ get('/cookie', function(request){
     secure: true 
   })
   
-  return { text: request.cookie('hobby').value } // will render 'literature'
+  return { text: '<h1>' + request.cookie('hobby').value + '</h1>' } // will render 'literature'
 })
 
 // Below we make a GET request to /haml (to simulate an http service call).
@@ -107,9 +107,9 @@ get('/async_example', function(params){
       body += chunk
     })
     
+    // Here we call on_screen manually when the request is complete.
+    // We can pass the normal scope object with body, status, template, etc.
     response.addListener('complete', function(){
-      // Here we call on_screen manually when the request is complete.
-      // We can pass the normal scope object with body, status, template, etc.
       params.on_screen({ body: body })
     })
   })

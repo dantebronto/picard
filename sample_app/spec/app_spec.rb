@@ -1,10 +1,5 @@
-require 'rubygems'
-require 'spec'
-require 'curb'
+require File.join(File.dirname(__FILE__), 'spec_helper')
 
-def base_url
-  'http://localhost:9900'
-end
 
 describe 'GET' do
   
@@ -37,7 +32,11 @@ describe 'GET' do
   
   it 'should follow redirects' do
     res = Curl::Easy.perform(base_url + '/redirect')
+    # rfc2616 10.3.3 Unless the request method was HEAD, the entity of the response
+    # SHOULD contain a short hypertext note with a hyperlink to the new URI(s).
+    res.body_str.should include('<a href="/haml">/haml</a>')
     res.header_str.should include('302')
+    
     
     res = Curl::Easy.perform(base_url + '/redirect') do |opt|
       opt.follow_location = true
