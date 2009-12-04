@@ -42,19 +42,22 @@ var request_extensions = {
     var filename = picard.env.root + picard.env.public + this.uri.path
     
     // non-blocking static file access
-    posix.cat(filename).addCallback(function(content){
+    posix.cat(filename, 'binary').addCallback(function(content){
       request.on_screen({ 
         body: content, 
-        type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0]) 
+        type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0]),
+        encoding: 'binary'
       })
     }).addErrback(function(){
       request.on_screen(null) 
     })
+    
   },
   
-  send_data: function(status, headers, body){
+  send_data: function(status, headers, body, encoding){
+    headers.push([ 'Content-Length', body.length ])
     this.response.sendHeader(status, headers)
-    this.response.sendBody(body)
+    this.response.sendBody(body, encoding)
     this.response.finish()
   },
   
@@ -68,6 +71,7 @@ var request_extensions = {
     var status = scope.status || 200
     var headers = scope.headers || []
     var body = scope.text || scope.body || ''
+    var encoding = scope.encoding || 'ascii'
     
     if(typeof(scope) == 'string')
       body = scope
@@ -79,12 +83,10 @@ var request_extensions = {
     if(scope.template){
       var template_path = picard.env.root + picard.env.views + '/' + scope.template
       haml.render(scope, template_path, function(body){
-        headers.push([ 'Content-Length', body.length ])
-        req.send_data(status, headers, body)
+        req.send_data(status, headers, body, encoding)
       })
     } else {
-      headers.push([ 'Content-Length', body.length ])
-      req.send_data(status, headers, body)
+      req.send_data(status, headers, body, encoding)
     }
     
     sys.puts((this._method || this.method).toUpperCase() + ' ' + this.uri.path + ' ' + status)

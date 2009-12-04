@@ -114,3 +114,19 @@ get('/async_example', function(params){
     })
   })
 })
+
+// You can also use helper functions for logic that is shared across routes.
+// Every Picard callback function gets called with a request/environment 
+// variable as the single argument. Here we pass this object to our helper 
+// function for evaluation:
+
+var authorized = function(request){
+  return (request.uri.path == '/holodeck') // very simple example
+}
+
+get('/holodeck', function(request){
+  if(authorized(request))
+    return 'Welcome'
+  else
+    return request.redirect('/')
+})
