@@ -72,7 +72,7 @@ p. See the sample app for more examples, including how to handle asynchronous pr
 
 h3. Benchmarks
 
-p. The included sinatra_app_for_benchmarks is a Ruby port of the Picard sample_app. According to these benchmarks, the Picard app on node.js runs about twice as fast as the Sinatra app on Thin and can handle around 12x as many requests per second (due to the asynchronous nature of node.js). Below is a sample output of the benchmarks:
+p. The included sinatra_app_for_benchmarks is a Ruby port of the Picard sample_app. According to these benchmarks, the Picard app on node.js runs about twice as fast as the Sinatra app on Thin and can handle around 10x as many requests per second (due to the asynchronous nature of node.js). Below is a sample output of the benchmarks:
 
 <pre>
   $ cd sinatra_app_for_benchmarks
