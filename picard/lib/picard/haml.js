@@ -391,11 +391,17 @@ Haml.parse = function (text) {
 if (exports) {
   exports.parse = Haml.parse;
   exports.to_html = Haml.to_html;
-  exports.render = function (scope, filename, callback) {
-    process.fs.cat(filename).addCallback(function (text) {
-      var json = Haml.parse.call(scope, text);
-      callback(Haml.to_html(json).replace("\n\n", "\n"));
-    });
+  exports.render = function(scope, callback){
+    var json = Haml.parse.call(scope, scope.body)
+    
+    scope.body = Haml.to_html(json).replace('\n\n', '\n')
+    callback(scope.body)
   }
+  // exports.render = function (scope, filename, callback) {
+  //   process.fs.cat(filename).addCallback(function (text) {
+  //     var json = Haml.parse.call(scope, text);
+  //     callback(Haml.to_html(json).replace("\n\n", "\n"));
+  //   });
+  // }
 }
 

@@ -1,5 +1,9 @@
 require('./config/env')
 
+get('/partial', function(){
+  return { template: 'partial_test.haml' }
+})
+
 get('/', function(){
   return { text: 'Hello Universe' }
 })

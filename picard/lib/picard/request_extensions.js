@@ -54,10 +54,10 @@ var request_extensions = {
     
   },
   
-  send_data: function(status, headers, body, encoding){
-    headers.push([ 'Content-Length', body.length ])
-    this.response.sendHeader(status, headers)
-    this.response.sendBody(body, encoding)
+  send_data: function(scope){
+    scope.headers.push([ 'Content-Length', scope.body.length ])
+    this.response.sendHeader(scope.status, scope.headers)
+    this.response.sendBody(scope.body, scope.encoding)
     this.response.finish()
   },
   
@@ -68,28 +68,29 @@ var request_extensions = {
       scope = { status: 404, body: "<h1> 404 Not Found </h1>" }
     
     var req = this
-    var status = scope.status || 200
-    var headers = scope.headers || []
-    var body = scope.text || scope.body || ''
-    var encoding = scope.encoding || 'ascii'
+    scope.status = scope.status || 200
+    scope.headers = scope.headers || []
+    scope.body = scope.text || scope.body || ''
+    scope.encoding = scope.encoding || 'ascii'
     
     if(typeof(scope) == 'string')
       body = scope
     
-    headers.push([ 'Server', 'Picard v0.1 "Prime Directive"' ])
-    headers.push([ 'Content-Type', scope.type || 'text/html' ])
-    headers = req.set_cookies(headers)
+    scope.headers.push([ 'Server', 'Picard v0.1 "Prime Directive"' ])
+    scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
+    scope.headers = req.set_cookies(scope.headers)
     
     if(scope.template){
-      var template_path = picard.env.root + picard.env.views + '/' + scope.template
-      haml.render(scope, template_path, function(body){
-        req.send_data(status, headers, body, encoding)
-      })
+      req.build_document(scope, true)
+      // var template_path = picard.env.root + picard.env.views + '/' + scope.template
+      // haml.render(scope, template_path, function(body){
+      //   req.send_data(status, headers, body, encoding)
+      // })
     } else {
-      req.send_data(status, headers, body, encoding)
+      req.send_data(scope)
     }
     
-    sys.puts((this._method || this.method).toUpperCase() + ' ' + this.uri.path + ' ' + status)
+    sys.puts((this._method || this.method).toUpperCase() + ' ' + this.uri.path + ' ' + scope.status)
     
     if(picard.env.mode == 'development')
       sys.puts(sys.inspect(this) + '\n') // request params logging
@@ -157,7 +158,41 @@ var request_extensions = {
       headers: [[ 'Location', location ]], 
       body: '<a href="'+ location + '">' + location + '</a>' 
     }
+  },
+  
+  build_document: function(scope, first_read){
+    var basepath = picard.env.root + picard.env.views + '/'
+    var filename = basepath + scope.template
+    var req = this
+    
+    if(first_read){
+      posix.cat(filename).addCallback(function(body){
+        scope.body = body
+        req.build_document(scope)
+      })
+    } else {
+      var partial = scope.body.match(/\=.?partial.?\(.?['|"](.*)['|"].?\)/)
+
+      if ( partial && partial[1] ){
+        var path = basepath + '_' + partial[1]
+
+        posix.cat(path).addCallback(function(body){
+
+          scope.body = scope.body.replace(partial[0], body)
+          req.build_document(scope)
+
+        }).addErrback(function(){
+          throw('Partial not found! ' + path)
+        })
+
+      } else {
+        haml.render(scope, function(body){
+          req.send_data(scope)
+        })
+      } 
+    }
   }
+  
   
 }
 
