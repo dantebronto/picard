@@ -80,15 +80,10 @@ var request_extensions = {
     scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
     scope.headers = req.set_cookies(scope.headers)
     
-    if(scope.template){
+    if(scope.template)
       req.build_document(scope, true)
-      // var template_path = picard.env.root + picard.env.views + '/' + scope.template
-      // haml.render(scope, template_path, function(body){
-      //   req.send_data(status, headers, body, encoding)
-      // })
-    } else {
+    else
       req.send_data(scope)
-    }
     
     sys.puts((this._method || this.method).toUpperCase() + ' ' + this.uri.path + ' ' + scope.status)
     
@@ -162,7 +157,7 @@ var request_extensions = {
   
   build_document: function(scope, first_read){
     var basepath = picard.env.root + picard.env.views + '/'
-    var filename = basepath + scope.template
+    var filename = basepath + scope.template + '.haml'
     var req = this
     
     if(first_read){
@@ -171,10 +166,10 @@ var request_extensions = {
         req.build_document(scope)
       })
     } else {
-      var partial = scope.body.match(/\=.?partial.?\(.?['|"](.*)['|"].?\)/)
+      var partial = scope.body.match(/\=.?partial.?\(.?['|"](.*)['|"].?\)$/)
 
       if ( partial && partial[1] ){
-        var path = basepath + '_' + partial[1]
+        var path = basepath + '_' + partial[1] + '.haml'
 
         posix.cat(path).addCallback(function(body){
 
@@ -186,13 +181,38 @@ var request_extensions = {
         })
 
       } else {
-        haml.render(scope, function(body){
-          req.send_data(scope)
-        })
+        req.layout_yield(scope)
       } 
     }
-  }
+  },
   
+  layout_yield: function(scope){
+    var req = this
+    
+    if(scope.layout){
+      var basepath = picard.env.root + picard.env.views + '/'
+      var filename = basepath + scope.layout + '.haml'
+
+      posix.cat(filename).addCallback(function(layout){
+        var yield = layout.match(/(\=.*yield)$/)
+        if( yield && yield[1] ){
+          scope.body = layout.replace(yield[1], scope.body)
+          haml.render(scope, function(body){
+            req.send_data(scope)
+          })
+        } else {
+          scope.body = layout
+          haml.render(scope, function(body){
+            req.send_data(scope)
+          })
+        }
+      })
+    } else {
+      haml.render(scope, function(body){
+        req.send_data(scope)
+      })
+    }
+  }
   
 }
 
