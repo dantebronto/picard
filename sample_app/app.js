@@ -1,7 +1,17 @@
 require('./config/env')
 
+var layout = "application"
+
+get('/thing/:foo/:bar', function(params){
+  return { text: params.foo + params.bar }
+})
+
+get('/layout', function(){
+  return { template: 'partial_test', layout: layout }
+})
+
 get('/partial', function(){
-  return { template: 'partial_test.haml' }
+  return { template: 'partial_test' }
 })
 
 get('/', function(){
@@ -14,7 +24,7 @@ get('/foo/:bar', function(params){
 
 get('/haml', function(){
   var scope = {
-    template: 'index.haml', 
+    template: 'index', 
     print_date: function () {
       return (new Date()).toDateString();
     },
