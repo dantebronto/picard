@@ -6,7 +6,7 @@ var request_extensions = {
   
   extract_form_params: function(chunk){
     if( chunk == undefined ) { return }
-    var chunks = chunk.split('&')
+    var chunks = decodeURIComponent(chunk).split('&')
     for(var i in chunks){
       var k_v = chunks[i].split('=')
       this[k_v[0]] = k_v[1]
