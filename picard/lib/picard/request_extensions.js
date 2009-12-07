@@ -35,9 +35,9 @@ var request_extensions = {
     this.on_screen(scope) 
   },
   
-  serve_static: function(){
+  serve_static: function(file){
     var request = this
-    var filename = picard.env.root + picard.env.public + this.uri.path
+    var filename = file || picard.env.root + picard.env.public + this.uri.path
     
     // non-blocking static file access
     posix.cat(filename, 'binary').addCallback(function(content){
