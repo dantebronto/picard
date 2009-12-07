@@ -17,10 +17,8 @@ var request_extensions = {
     if( match_data == null ){ return } else { match_data.shift() }
     this.captures = []
     
-    for(var i=0, l = route.keys.length; i < l; i++){
-      this[route.keys[i]] = match_data[i]
-      match_data.splice(i,1)
-    }
+    for(var i=0, l = route.keys.length; i < l; i++)
+      this[route.keys[i]] = match_data.shift()
     
     for(var i=0, l = match_data.length; i < l; i++)
       this.captures[i] = match_data[i]

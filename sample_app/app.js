@@ -4,10 +4,6 @@ get('/', function(){
   return { text: 'Hello Universe' }
 })
 
-get('/foo/:bar', function(params){
-  return { text: params.bar }
-})
-
 get('/haml', function(){
   var scope = {
     template: 'index.haml', 
@@ -87,6 +83,14 @@ get('/cookie', function(request){
   })
   
   return { text: '<h1>' + request.cookie('hobby').value + '</h1>' } // will render 'literature'
+})
+
+get('/foo/:bar', function(params){
+  return { text: params.bar }
+})
+
+get('/multiple/:thing/:stuff', function(params){
+  return { text: params.thing + " " + params.stuff }
 })
 
 // Below we make a GET request to /haml (to simulate an http service call).

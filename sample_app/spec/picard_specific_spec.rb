@@ -14,6 +14,11 @@ describe 'Picard specific tests' do
     res.body_str.should include('404')
     res.header_str.should include('404')
   end
+
+  it 'should allow multple URL params' do
+    res = Curl::Easy.perform(base_url + '/multiple/bar/baz')
+    res.body_str.should eql("bar baz")
+  end
   
   describe 'cookies' do
     before do

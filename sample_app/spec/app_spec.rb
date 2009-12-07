@@ -5,13 +5,13 @@ describe 'GET' do
   
   it 'should do gets' do
     res = Curl::Easy.perform(base_url + '/')
-    res.body_str.should == "Hello Universe"
+    res.body_str.should eql("Hello Universe")
     res.header_str.should include('200')
   end
 
   it 'should do gets with normal params' do
     res = Curl::Easy.perform(base_url + '/foo/bar')
-    res.body_str.should == "bar"
+    res.body_str.should eql("bar")
     res.header_str.should include('200')
   end
   
