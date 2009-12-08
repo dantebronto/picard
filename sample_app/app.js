@@ -1,13 +1,5 @@
 require('./config/env')
 
-get('/power_haml', function(p){
-
-  return { 
-    template: 'kellen.haml',
-    todolist: [ { description: 'foo' }, { description: 'bar' } ]
-  }
-})
-
 get('/', function(){
   return { text: 'Hello Universe' }
 })
