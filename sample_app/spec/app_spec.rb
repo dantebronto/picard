@@ -5,13 +5,13 @@ describe 'GET' do
   
   it 'should do gets' do
     res = Curl::Easy.perform(base_url + '/')
-    res.body_str.should == "Hello Universe"
+    res.body_str.should eql("Hello Universe")
     res.header_str.should include('200')
   end
 
   it 'should do gets with normal params' do
     res = Curl::Easy.perform(base_url + '/foo/bar')
-    res.body_str.should == "bar"
+    res.body_str.should eql("bar")
     res.header_str.should include('200')
   end
   
@@ -25,7 +25,7 @@ describe 'GET' do
   
   it 'should render json' do
     res = Curl::Easy.perform(base_url + '/json')
-    res.body_str.should include("[{\"command_1\":\"Make it so\"},{\"command_2\":\"You have the bridge, Number One\"}]")
+    res.body_str.should include("[{\"command\":\"Make it so\"},{\"command\":\"You have the bridge, Number One\"}]")
     res.header_str.should include('application/json')
     res.header_str.should include('200')
   end

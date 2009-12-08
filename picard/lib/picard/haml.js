@@ -217,9 +217,9 @@ Haml.parse = function (text) {
     }
     mode = 'ELEMENT';
 
-    classes = selector.match(/\.[^\.#]+/g),
+    var classes = selector.match(/\.[^\.#]+/g),
     ids = selector.match(/#[^\.#]+/g),
-    tag = selector.match(/^%([^\.#]+)/g);
+    tag = selector.match(/^%([^\.#]+)/g),
     plugin = selector.match(/^:([^\.#]+)/g);
     tag = tag ? tag[0].substr(1) : (plugin ? null : 'div');
     plugin = plugin ? plugin[0].substr(1) : null;
@@ -272,10 +272,10 @@ Haml.parse = function (text) {
   
   function process_plugins() {
     var contents, i;
-    switch (element[0]) {
-    case ':if':
-      var condition = element[1].condition;
-      contents = element[2];
+    switch (element[0].plugin) {
+    case 'if':
+      var condition = element[0].condition
+      contents = element[1]
       for (i in element) {
         if (element.hasOwnProperty(i)) {
           delete element[i];
@@ -291,17 +291,14 @@ Haml.parse = function (text) {
         element.length = new_element.length;
       }
       break;
-    case ':foreach':
+    case 'foreach':
       var array, key, value, key_name, value_name;
-      array = element[1].array;
-      key_name = element[1].key;
-      value_name = element[1].value;
-      contents = element[2];
-      for (i in element) {
-        if (element.hasOwnProperty(i)) {
-          delete element[i];
-        }
-      }
+      
+      array = element[0].array            
+      for (var i in array[0]) { key_name = i }
+      value_name = element[0].value
+      contents = element[1]
+
       element.length = 0;
       for (key in array) {
         if (array.hasOwnProperty(key)) {

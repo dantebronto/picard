@@ -14,6 +14,11 @@ describe 'Picard specific tests' do
     res.body_str.should include('404')
     res.header_str.should include('404')
   end
+
+  it 'should allow multple URL params' do
+    res = Curl::Easy.perform(base_url + '/multiple/bar/baz')
+    res.body_str.should eql("bar baz")
+  end
   
   describe 'cookies' do
     before do
@@ -27,6 +32,22 @@ describe 'Picard specific tests' do
     it 'should set two cookies' do
       @res.header_str.should include('Set-Cookie: hobby=literature;')
       @res.header_str.should include('Set-Cookie: user=LCDR Data;')
+    end
+  end
+
+  describe 'advanced haml' do
+    before do
+      @res = Curl::Easy.perform(base_url + '/advanced_haml')
+    end
+
+    it 'should allow for the "if" plugin' do
+      @res.body_str.should include("This will show up!")
+      @res.body_str.should_not include("This will not show up!")
+    end
+
+    it 'should allow for the "foreach" plugin' do
+      @res.body_str.should include("<li>Make it so</li>")
+      @res.body_str.should include("<li>You have the bridge, Number One</li>")
     end
   end
 

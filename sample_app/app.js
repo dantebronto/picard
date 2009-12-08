@@ -1,30 +1,39 @@
 require('./config/env')
 
-var layout = "application"
-
-get('/thing/:foo/:bar', function(params){
-  return { text: params.foo + params.bar }
-})
-
-get('/layout', function(){
-  return { template: 'partial_test', layout: layout }
-})
-
-get('/partial', function(){
-  return { template: 'partial_test' }
-})
+// var layout = "application"
+// 
+// get('/thing/:foo/:bar', function(params){
+//   return { text: params.foo + params.bar }
+// })
+// 
+// get('/layout', function(){
+//   return { template: 'partial_test', layout: layout }
+// })
+// 
+// get('/partial', function(){
+//   return { template: 'partial_test' }
+// })
+// 
+// get('/', function(){
+//   return { text: 'Hello Universe' }
+// 
+// get('/power_haml', function(p){
+// 
+//   return { 
+//     template: 'kellen.haml',
+//     todolist: [ { description: 'foo' }, { description: 'bar' } ]
+//   }
+// 
+// })
 
 get('/', function(){
   return { text: 'Hello Universe' }
 })
 
-get('/foo/:bar', function(params){
-  return { text: params.bar }
-})
-
 get('/haml', function(){
-  var scope = {
-    template: 'index', 
+  return {
+    //template: 'index.haml', 
+    template: 'index',
     print_date: function () {
       return (new Date()).toDateString();
     },
@@ -32,16 +41,25 @@ get('/haml', function(){
       name: "Jean-Luc Picard",
       bio: "Captain of the USS Enterprise"
     }
-  };
-  return scope
+  }
 })
+
+var commands = [ 
+  { command: 'Make it so' }, 
+  { command: 'You have the bridge, Number One' } 
+]
 
 get('/json', function(){
   return {
     type: 'application/json',
-    body: JSON.stringify( 
-      [ { command_1: 'Make it so' },
-        { command_2: 'You have the bridge, Number One' } ] )
+    body: JSON.stringify(commands)
+  }
+})
+
+get('/advanced_haml', function(){
+  return { 
+    template: 'advanced.haml',
+    commands: commands // defined above
   }
 })
 
@@ -101,6 +119,14 @@ get('/cookie', function(request){
   })
   
   return { text: '<h1>' + request.cookie('hobby').value + '</h1>' } // will render 'literature'
+})
+
+get('/foo/:bar', function(params){
+  return { text: params.bar }
+})
+
+get('/multiple/:thing/:stuff', function(params){
+  return { text: params.thing + " " + params.stuff }
 })
 
 // Below we make a GET request to /haml (to simulate an http service call).
