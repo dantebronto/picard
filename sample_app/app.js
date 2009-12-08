@@ -1,5 +1,9 @@
 require('./config/env')
 
+get('/partial', function(){
+  return { template: 'partial_test', layout:  }
+})
+
 // var layout = "application"
 // 
 // get('/thing/:foo/:bar', function(params){
@@ -17,14 +21,6 @@ require('./config/env')
 // get('/', function(){
 //   return { text: 'Hello Universe' }
 // 
-// get('/power_haml', function(p){
-// 
-//   return { 
-//     template: 'kellen.haml',
-//     todolist: [ { description: 'foo' }, { description: 'bar' } ]
-//   }
-// 
-// })
 
 get('/', function(){
   return { text: 'Hello Universe' }
@@ -58,7 +54,7 @@ get('/json', function(){
 
 get('/advanced_haml', function(){
   return { 
-    template: 'advanced.haml',
+    template: 'advanced',
     commands: commands // defined above
   }
 })
