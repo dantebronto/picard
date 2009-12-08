@@ -35,4 +35,20 @@ describe 'Picard specific tests' do
     end
   end
 
+  describe 'advanced haml' do
+    before do
+      @res = Curl::Easy.perform(base_url + '/advanced_haml')
+    end
+
+    it 'should allow for the "if" plugin' do
+      @res.body_str.should include("This will show up!")
+      @res.body_str.should_not include("This will not show up!")
+    end
+
+    it 'should allow for the "foreach" plugin' do
+      @res.body_str.should include("<li>Make it so</li>")
+      @res.body_str.should include("<li>You have the bridge, Number One</li>")
+    end
+  end
+
 end

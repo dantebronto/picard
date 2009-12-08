@@ -1,11 +1,19 @@
 require('./config/env')
 
+get('/power_haml', function(p){
+
+  return { 
+    template: 'kellen.haml',
+    todolist: [ { description: 'foo' }, { description: 'bar' } ]
+  }
+})
+
 get('/', function(){
   return { text: 'Hello Universe' }
 })
 
 get('/haml', function(){
-  var scope = {
+  return {
     template: 'index.haml', 
     print_date: function () {
       return (new Date()).toDateString();
@@ -14,16 +22,25 @@ get('/haml', function(){
       name: "Jean-Luc Picard",
       bio: "Captain of the USS Enterprise"
     }
-  };
-  return scope
+  }
 })
+
+var commands = [ 
+  { command: 'Make it so' }, 
+  { command: 'You have the bridge, Number One' } 
+]
 
 get('/json', function(){
   return {
     type: 'application/json',
-    body: JSON.stringify( 
-      [ { command_1: 'Make it so' },
-        { command_2: 'You have the bridge, Number One' } ] )
+    body: JSON.stringify(commands)
+  }
+})
+
+get('/advanced_haml', function(){
+  return { 
+    template: 'advanced.haml',
+    commands: commands // defined above
   }
 })
 

@@ -1,0 +1,11 @@
+#page Advanced Haml Usage
+  
+  :if{ condition: true }
+    %p This will show up!
+  
+  :if{ condition: 0 > 1 }
+    %p This will not show up!
+
+  %ul.todolist
+    :foreach{ array: commands, value: "item" }
+      %li= item.command
