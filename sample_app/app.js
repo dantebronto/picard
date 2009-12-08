@@ -1,34 +1,11 @@
 require('./config/env')
 
-get('/partial', function(){
-  return { template: 'partial_test', layout:  }
-})
-
-// var layout = "application"
-// 
-// get('/thing/:foo/:bar', function(params){
-//   return { text: params.foo + params.bar }
-// })
-// 
-// get('/layout', function(){
-//   return { template: 'partial_test', layout: layout }
-// })
-// 
-// get('/partial', function(){
-//   return { template: 'partial_test' }
-// })
-// 
-// get('/', function(){
-//   return { text: 'Hello Universe' }
-// 
-
 get('/', function(){
   return { text: 'Hello Universe' }
 })
 
 get('/haml', function(){
   return {
-    //template: 'index.haml', 
     template: 'index',
     print_date: function () {
       return (new Date()).toDateString();
@@ -59,7 +36,16 @@ get('/advanced_haml', function(){
   }
 })
 
-get('/redirect/?', function(request){ // the '?' at the end of the route makes the trailing slash optional
+get('/partial', function(){
+  return { 
+    template: 'partial_test', 
+    layout: 'application'
+  }
+})
+
+get('/redirect/?', function(request){
+  // the '?' at the end of the route 
+  // makes the trailing slash optional
   return request.redirect('/haml')
 })
 

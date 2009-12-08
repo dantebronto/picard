@@ -5,6 +5,14 @@
 
 function Haml() {}
 
+function partial(file){
+  return "==partial('" + file + "')"
+}
+
+function yield(){
+  return "==yield()"
+}
+
 Haml.to_html = function (json) {
   
   if (typeof json === 'string') {
@@ -386,9 +394,8 @@ Haml.parse = function (text) {
 
 exports.parse = Haml.parse;
 exports.to_html = Haml.to_html;
-exports.render = function(scope, callback){
-  var json = Haml.parse.call(scope, scope.body)
-  scope.body = Haml.to_html(json).replace('\n\n', '\n')
-  require('sys').puts(scope.body)
-  callback(scope.body)
+exports.render = function(scope, text, callback){
+  var json = Haml.parse.call(scope, text)
+  text = Haml.to_html(json).replace('\n\n', '\n')
+  callback(text)
 }

@@ -79,10 +79,21 @@ var request_extensions = {
     scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
     scope.headers = req.set_cookies(scope.headers)
     
-    if(scope.template)
-      req.build_document(scope, true)
-    else
+    if(scope.template){
+      
+      var basepath = picard.env.root + picard.env.views + '/'
+      var filename = basepath + scope.template + '.haml'
+      
+      posix.cat(filename).addCallback(function(body){
+        haml.render(scope, body, function(new_body){
+          scope.body = new_body
+          req.build_document(scope)
+        })
+      })
+      
+    } else{
       req.send_data(scope)
+    }
     
     sys.puts((this._method || this.method).toUpperCase() + ' ' + this.uri.path + ' ' + scope.status)
     
@@ -154,63 +165,46 @@ var request_extensions = {
     }
   },
   
-  build_document: function(scope, first_read){
+  build_document: function(scope){
     var basepath = picard.env.root + picard.env.views + '/'
-    var filename = basepath + scope.template + '.haml'
+    var partial = scope.body.match(/\=\=partial\('(.*)'\)/)
     var req = this
     
-    if(first_read){
-      posix.cat(filename).addCallback(function(body){
-        scope.body = body
-        req.build_document(scope)
-      })
-    } else {
-      var partial = scope.body.match(/\=.?partial.?\(.?['|"](.*)['|"].?\)$/)
-
-      if ( partial && partial[1] ){
-        var path = basepath + '_' + partial[1] + '.haml'
-
-        posix.cat(path).addCallback(function(body){
-
-          scope.body = scope.body.replace(partial[0], body)
+    if ( partial && partial[1] ){
+      var path = basepath + '_' + partial[1] + '.haml'
+      
+      posix.cat(path).addCallback(function(body){
+        haml.render(scope, body, function(partial_content){
+          scope.body = scope.body.replace(partial[0], partial_content)
           req.build_document(scope)
-
-        }).addErrback(function(){
-          throw('Partial not found! ' + path)
         })
-
-      } else {
+      })
+        
+    } else {
+      
+      if(scope.layout)
         req.layout_yield(scope)
-      } 
+      else
+        req.send_data(scope)
     }
   },
-  
-  layout_yield: function(scope){
+
+  layout_yield: function(scope){    
     var req = this
     
-    if(scope.layout){
-      var basepath = picard.env.root + picard.env.views + '/'
-      var filename = basepath + scope.layout + '.haml'
+    var basepath = picard.env.root + picard.env.views + '/'
+    var filename = basepath + scope.layout + '.haml'
 
-      posix.cat(filename).addCallback(function(layout){
-        var yield = layout.match(/(\=.*yield)$/)
-        if( yield && yield[1] ){
-          scope.body = layout.replace(yield[1], scope.body)
-          haml.render(scope, function(body){
-            req.send_data(scope)
-          })
-        } else {
-          scope.body = layout
-          haml.render(scope, function(body){
-            req.send_data(scope)
-          })
-        }
-      })
-    } else {
-      haml.render(scope, function(body){
+    posix.cat(filename).addCallback(function(layout){        
+      haml.render(scope, layout, function(layout_content){
+        var yield = layout_content.match(/\=\=yield\(\)/)          
+        if( yield )
+          scope.body = layout_content.replace(yield, scope.body)
         req.send_data(scope)
       })
-    }
+    }).addErrback(function(){
+      req.send_data(scope)
+    })
   }
   
 }
