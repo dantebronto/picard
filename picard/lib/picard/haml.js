@@ -394,8 +394,7 @@ Haml.parse = function (text) {
 
 exports.parse = Haml.parse;
 exports.to_html = Haml.to_html;
-exports.render = function(scope, text, callback){
+exports.render = function(scope, text){
   var json = Haml.parse.call(scope, text)
-  text = Haml.to_html(json).replace('\n\n', '\n')
-  callback(text)
+  return Haml.to_html(json).replace('\n\n', '\n')
 }

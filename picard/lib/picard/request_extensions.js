@@ -85,10 +85,8 @@ var request_extensions = {
       var filename = basepath + scope.template + '.haml'
       
       posix.cat(filename).addCallback(function(body){
-        haml.render(scope, body, function(new_body){
-          scope.body = new_body
-          req.build_document(scope)
-        })
+        scope.body = haml.render(scope, body)
+        req.build_document(scope)
       })
       
     } else{
@@ -174,10 +172,9 @@ var request_extensions = {
       var path = basepath + '_' + partial[1] + '.haml'
       
       posix.cat(path).addCallback(function(body){
-        haml.render(scope, body, function(partial_content){
-          scope.body = scope.body.replace(partial[0], partial_content)
-          req.build_document(scope)
-        })
+        var partial_content = haml.render(scope, body)
+        scope.body = scope.body.replace(partial[0], partial_content)
+        req.build_document(scope)
       })
         
     } else {
@@ -196,12 +193,11 @@ var request_extensions = {
     var filename = basepath + scope.layout + '.haml'
 
     posix.cat(filename).addCallback(function(layout){        
-      haml.render(scope, layout, function(layout_content){
-        var yield = layout_content.match(/\=\=yield\(\)/)          
-        if( yield )
-          scope.body = layout_content.replace(yield, scope.body)
-        req.send_data(scope)
-      })
+      var layout_content = haml.render(scope, layout)
+      var yield = layout_content.match(/\=\=yield\(\)/)          
+      if( yield )
+        scope.body = layout_content.replace(yield, scope.body)
+      req.send_data(scope)
     }).addErrback(function(){
       req.send_data(scope)
     })
