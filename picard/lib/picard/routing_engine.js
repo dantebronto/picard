@@ -21,17 +21,13 @@ var routes = {
 
   rest_type: function(request){
     var route_array = []
-    if(request.method == 'GET')
-      route_array = get_routes
-    else if(request.method == 'POST'){
-      route_array = post_routes
-      
-      var rest_method = (request._method || '').toUpperCase()
-      
-      if( rest_method == 'PUT' )
-        route_array = put_routes
-      else if ( rest_method == 'DELETE' )
-        route_array = delete_routes
+    var rest_method = (request._method || request.method).toUpperCase()
+    
+    switch( rest_method ) {
+      case 'GET'   : route_array = get_routes   ; break
+      case 'POST'  : route_array = post_routes  ; break
+      case 'PUT'   : route_array = put_routes   ; break
+      case 'DELETE': route_array = delete_routes; break
     }
     return route_array
   },
@@ -64,16 +60,16 @@ var put_routes = []
 var delete_routes = []
 
 GLOBAL.get = function(path, handler){
-  get_routes[get_routes.length] = routes.add(path, handler)
+  get_routes.push(routes.add(path, handler))
 }
 GLOBAL.post = function(path, handler){
-  post_routes[post_routes.length] = routes.add(path, handler)
+  post_routes.push(routes.add(path, handler))
 }
 GLOBAL.put = function(path, handler){
-  put_routes[put_routes.length] = routes.add(path, handler)
+  put_routes.push(routes.add(path, handler))
 }
 GLOBAL.del = function(path, handler){
-  delete_routes[delete_routes.length] = routes.add(path, handler)
+  delete_routes.push(routes.add(path, handler))
 }
 
 picard = exports
