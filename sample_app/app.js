@@ -102,7 +102,8 @@ get('/cookie', function(request){
     secure: true 
   })
   
-  return { text: '<h1>' + request.cookie('hobby').value + '</h1>' } // will render 'literature'
+  // will render 'literature'
+  return { text: '<h1>' + request.cookie('hobby').value + '</h1>' }
 })
 
 get('/foo/:bar', function(params){
