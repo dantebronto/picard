@@ -50,5 +50,32 @@ describe 'Picard specific tests' do
       @res.body_str.should include("<li>You have the bridge, Number One</li>")
     end
   end
+  
+  describe 'partials and layouts' do
+    before do
+      @res = Curl::Easy.perform(base_url + '/partial')
+    end
+    
+    it 'should render the layout' do
+      @res.body_str.should include("<title>Picard v0.1 \"Prime Directive\"</title>")
+    end
+    
+    it 'should render the template' do
+      @res.body_str.should include("This is \"partial_test.haml\" content")
+    end
+    
+    it 'should render the first partial' do
+      @res.body_str.should include("This is \"snippet.haml\" content")
+    end
+    
+    it 'should render the partial within a partial' do
+      @res.body_str.should include("This is \"sub_partial.haml\" content")
+    end
+    
+    it 'should render commands partial' do
+      @res.body_str.should include("<li>Make it so</li>")
+      @res.body_str.should include("<li>You have the bridge, Number One</li>")
+    end
+  end
 
 end
