@@ -39,7 +39,8 @@ get('/advanced_haml', function(){
 get('/partial', function(){
   return { 
     template: 'partial_test', 
-    layout: 'application'
+    layout: 'application',
+    commands: commands
   }
 })
 
@@ -53,7 +54,9 @@ post('/order', function(){
   return { text: 'Tea, Earl Grey, Hot' }
 })
 
-// simulate form params with `curl -d "foo=bar&baz=bat" http://localhost:9900/with_params`
+// simulate form params with:
+// `curl -d "foo=bar&baz=bat" http://localhost:9900/with_params`
+
 post('/with_params', function(params){
   return { text: '<h1>' + params.foo + ' ' + params.baz + '</h1>' }
 })
@@ -62,8 +65,7 @@ put('/weapon/:id', function(params){
   return { text: '<p>Phaser with id #' + params.id + ' set to stun</p>' }
 })
  
-del('/fire/:number', function(params){
-  
+del('/fire/:number', function(params){  
   var text = '<p>Borg cube destroyed using ' + params.number + ' photon torpedoes</p>'
   
   if (  Number(params.number) > 12 )

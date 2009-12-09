@@ -3,6 +3,8 @@
     nomen: true, plusplus: true, regexp: true, undef: true, white: true, indent: 2 */
 /*globals */
 
+var posix = require('posix')
+
 function Haml() {}
 
 function partial(file){
@@ -300,13 +302,21 @@ Haml.parse = function (text) {
       }
       break;
     case 'foreach':
-      var array, key, value, key_name, value_name;
+      var array, key, value, key_name, value_name, partial_match
       
-      array = element[0].array            
+      array = element[0].array
       for (var i in array[0]) { key_name = i }
       value_name = element[0].value
       contents = element[1]
-
+      
+      partial_match = contents.match(/\=.?partial\(\s*?['|"](.*)['|"]\s*?\)/)
+      if ( partial_match ){ // TODO: fix partial calls in "foreach", must be evaluated immediately
+        var file = picard.env.root + picard.env.views + '/' + partial_match[1] + '.haml'
+        posix.cat(file).addCallback(function(body){
+          contents = contents.replace(partial_match[0], body)
+        }).wait()
+      }
+      
       element.length = 0;
       for (key in array) {
         if (array.hasOwnProperty(key)) {
@@ -319,7 +329,7 @@ Haml.parse = function (text) {
       break;
     }
   }
-    
+  
   haml = [];
   element = haml;
   stack = [];

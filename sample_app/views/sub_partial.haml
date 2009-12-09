@@ -1,0 +1,5 @@
+%p This is "sub_partial.haml" content
+
+%ul.todolist
+  :foreach{ array: commands, value: "item" }
+    =partial( 'subdir/command' )
