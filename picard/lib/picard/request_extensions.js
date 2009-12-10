@@ -60,7 +60,7 @@ var request_extensions = {
     this.response.finish()
   },
   
-  on_screen: function(scope){
+  on_screen: function(scope){    
     if( this.response.finished ){ return }
     
     if ( scope == null )
@@ -73,7 +73,7 @@ var request_extensions = {
     scope.encoding = scope.encoding || 'ascii'
     
     if(typeof(scope) == 'string')
-      body = scope
+      scope.body = scope
     
     scope.headers.push([ 'Server', 'Picard v0.1 "Prime Directive"' ])
     scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
