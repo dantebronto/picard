@@ -73,7 +73,7 @@ var request_extensions = {
     scope.encoding = scope.encoding || 'ascii'
     
     if(typeof(scope) == 'string')
-      scope.body = scope
+      scope = { text: scope }
     
     scope.headers.push([ 'Server', 'Picard v0.1 "Prime Directive"' ])
     scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
