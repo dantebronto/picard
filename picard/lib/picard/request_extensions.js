@@ -67,13 +67,14 @@ var request_extensions = {
       scope = { status: 404, body: "<h1> 404 Not Found </h1>" }
     
     var req = this
+    
+    if(typeof(scope) == 'string')
+      scope = { text: scope }
+    
     scope.status = scope.status || 200
     scope.headers = scope.headers || []
     scope.body = scope.text || scope.body || ''
     scope.encoding = scope.encoding || 'ascii'
-    
-    if(typeof(scope) == 'string')
-      scope = { text: scope }
     
     scope.headers.push([ 'Server', 'Picard v0.1 "Prime Directive"' ])
     scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
