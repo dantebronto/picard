@@ -76,7 +76,7 @@ var request_extensions = {
     scope.body = scope.text || scope.body || ''
     scope.encoding = scope.encoding || 'ascii'
     
-    scope.headers.push([ 'Server', 'Picard v0.1 "Prime Directive"' ])
+    scope.headers.push([ 'Server', picard.env.server || 'Picard v0.1 "Prime Directive"' ])
     scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
     scope.headers = req.set_cookies(scope.headers)
 
