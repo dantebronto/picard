@@ -281,7 +281,7 @@ Haml.parse = function (text) {
   }
   
   function process_plugins() {
-    var contents, i;
+    var contents, i
     switch (element[0].plugin) {
     case 'if':
       var condition = element[0].condition
@@ -292,17 +292,26 @@ Haml.parse = function (text) {
         }
       }
       if (condition) {
-        var new_element = Haml.parse.call(this, contents);
+        var new_element
+        
+        if ( contents.charAt(0) == '=' )
+          new_element = Haml.parse.call(this, "%function" + contents)
+        else
+          new_element = Haml.parse.call(this, contents)
+          
+        if( new_element == "" ) // plain text passed in
+          new_element = contents
+ 
         for (i in new_element) {
           if (new_element.hasOwnProperty(i)) {
-            element[i] = new_element[i];
+            element[i] = new_element[i]
           }
         }
-        element.length = new_element.length;
+        element.length = new_element.length
       }
       break;
     case 'foreach':
-      var array, key, value, key_name, value_name, partial_match
+      var array, key, value, key_name, value_name, partial_match, new_element
       
       array = element[0].array
       for (var i in array[0]) { key_name = i }
@@ -323,7 +332,16 @@ Haml.parse = function (text) {
           value = array[key];
           this[key_name] = key;
           this[value_name] = value;
-          element.push(Haml.parse.call(this, contents));
+          
+          if ( contents.charAt(0) == '=' )
+            new_element = Haml.parse.call(this, "%function" + contents)
+          else
+            new_element = Haml.parse.call(this, contents)
+          
+          if( new_element == "" )
+            new_element = contents
+          
+          element.push(new_element)
         }
       }
       break;
@@ -399,6 +417,10 @@ Haml.parse = function (text) {
   if (haml.length === 1 && typeof haml[0] !== 'string') {
     haml = haml[0];
   }
+  
+  if (haml[0] && haml[0].tag && haml[0].tag == 'function')
+    return haml[1]
+  
   return haml;
 };
 
