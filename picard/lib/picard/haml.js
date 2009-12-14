@@ -280,6 +280,33 @@ Haml.parse = function (text) {
     }
   }
   
+  function foreach_callback(element, contents) {
+    var array, key, value, key_name, value_name, new_element
+    
+    array = element[0].array
+    for (i in array[0]) { key_name = i }
+    value_name = element[0].value
+    
+    element.length = 0;
+    for (key in array) {
+      if (array.hasOwnProperty(key)) {
+        value = array[key];
+        this[key_name] = key;
+        this[value_name] = value;
+        
+        if ( contents.charAt(0) == '=' )
+          new_element = Haml.parse.call(this, "%function" + contents)
+        else
+          new_element = Haml.parse.call(this, contents)
+        
+        if( new_element == "" )
+          new_element = contents
+        
+        element.push(new_element)
+      }
+    }
+  }
+  
   function process_plugins() {
     var contents, i
     switch (element[0].plugin) {
@@ -311,14 +338,9 @@ Haml.parse = function (text) {
       }
       break;
     case 'foreach':
-      var array, key, value, key_name, value_name, partial_match, new_element
+      var contents = element[1]
+      var partial_match = contents.match(/\=.?partial\(\s*?['|"](.*)['|"]\s*?\)/)
       
-      array = element[0].array
-      for (var i in array[0]) { key_name = i }
-      value_name = element[0].value
-      contents = element[1]
-      
-      partial_match = contents.match(/\=.?partial\(\s*?['|"](.*)['|"]\s*?\)/)
       if ( partial_match ){ // TODO: fix partial calls in "foreach", must be evaluated immediately
         var file = picard.env.root + picard.env.views + '/' + partial_match[1] + '.haml'
         posix.cat(file).addCallback(function(body){
@@ -326,25 +348,8 @@ Haml.parse = function (text) {
         }).wait()
       }
       
-      element.length = 0;
-      for (key in array) {
-        if (array.hasOwnProperty(key)) {
-          value = array[key];
-          this[key_name] = key;
-          this[value_name] = value;
-          
-          if ( contents.charAt(0) == '=' )
-            new_element = Haml.parse.call(this, "%function" + contents)
-          else
-            new_element = Haml.parse.call(this, contents)
-          
-          if( new_element == "" )
-            new_element = contents
-          
-          element.push(new_element)
-        }
-      }
-      break;
+      foreach_callback.call(this, element, contents)
+      break
     }
   }
   

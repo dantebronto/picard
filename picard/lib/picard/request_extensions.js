@@ -71,13 +71,13 @@ var request_extensions = {
     if(typeof(scope) == 'string')
       scope = { text: scope }
     
-    scope.status = scope.status || 200
-    scope.headers = scope.headers || []
-    scope.body = scope.text || scope.body || ''
+    scope.status   = scope.status   || 200
+    scope.headers  = scope.headers  || []
+    scope.body     = scope.text     || scope.body || ''
     scope.encoding = scope.encoding || 'ascii'
     
     scope.headers.push([ 'Server', picard.env.server || 'Picard v0.1 "Prime Directive"' ])
-    scope.headers.push([ 'Content-Type', scope.type || 'text/html' ])
+    scope.headers.push([ 'Content-Type', scope.type  || 'text/html' ])
     scope.headers = req.set_cookies(scope.headers)
 
     req.build_document(scope)
