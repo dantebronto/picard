@@ -144,11 +144,11 @@ Haml.parse = function (text) {
     if (!(line.length > 0 && line.charAt(0) === '{')) {
       return line;
     }
-    var l = line.length;
+    var i, l = line.length;
     var count = 1;
     var quote = false;
     var skip = false;
-    for (var i = 1; count > 0; i += 1) {
+    for (i = 1; count > 0; i += 1) {
 
       // If we reach the end of the line, then there is a problem
       if (i > l) {
@@ -226,7 +226,8 @@ Haml.parse = function (text) {
       parse_push();
     }
     mode = 'ELEMENT';
-
+    
+    var i
     var classes = selector.match(/\.[^\.#]+/g),
     ids = selector.match(/#[^\.#]+/g),
     tag = selector.match(/^%([^\.#]+)/g),
@@ -250,7 +251,7 @@ Haml.parse = function (text) {
       attrs.plugin = plugin;
     }
     if (ids) {
-      for (var i = 0, l = ids.length; i < l; i += 1) {
+      for (i = 0, l = ids.length; i < l; i += 1) {
         ids[i] = ids[i].substr(1);
       }
       if (attrs.id) {
@@ -259,7 +260,7 @@ Haml.parse = function (text) {
       attrs.id = ids.join(" ");
     }
     if (classes) {
-      for (var i = 0, l = classes.length; i < l; i += 1) {
+      for (i = 0, l = classes.length; i < l; i += 1) {
         classes[i] = classes[i].substr(1);
       }
       if (attrs['class']) {

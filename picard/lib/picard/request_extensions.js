@@ -14,14 +14,15 @@ var request_extensions = {
   },
   
   extract_route_params: function(route, match_data){
-
+    var i, l
+    
     if( match_data == null ){ return } else { match_data.shift() }
     this.captures = []
     
-    for(var i=0, l = route.keys.length; i < l; i++)
+    for(i=0, l = route.keys.length; i < l; i++)
       this[route.keys[i]] = match_data.shift()
     
-    for(var i=0, l = match_data.length; i < l; i++)
+    for(i=0, l = match_data.length; i < l; i++)
       this.captures[i] = match_data[i]
   },
   
@@ -38,7 +39,7 @@ var request_extensions = {
   
   serve_static: function(file){
     var request = this
-    var filename = file || picard.env.root + picard.env.public + this.uri.path
+    var filename = file || picard.env.root + picard.env.public_dir + this.uri.path
     
     // non-blocking static file access
     posix.cat(filename, 'binary').addCallback(function(content){
