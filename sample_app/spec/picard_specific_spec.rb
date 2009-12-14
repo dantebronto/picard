@@ -31,7 +31,7 @@ describe 'Picard specific tests' do
 
     it 'should set two cookies' do
       @res.header_str.should include('Set-Cookie: hobby=literature;')
-      @res.header_str.should include('Set-Cookie: user=LCDR Data;')
+      @res.header_str.should include('Set-Cookie: user=LCDR%20Data;')
     end
   end
 

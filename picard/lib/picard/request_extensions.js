@@ -116,7 +116,7 @@ var request_extensions = {
     for(name in this.cookies) {
       if( this.cookies[name].preset ){ continue }
       options = this.cookies[name]
-      ret = name + '=' + options.value
+      ret = name + '=' + encodeURIComponent(options.value)
       
       if (options.expires)
         ret += '; expires=' + options.expires.toUTCString()
@@ -138,9 +138,9 @@ var request_extensions = {
     var cookieHeader = self.headers["cookie"]
     
     if (cookieHeader){
-      cookieHeader.split(";").forEach(function(cookie){
+      cookieHeader.split("; ").forEach(function(cookie){
         var parts = cookie.split("=")
-        self.cookie(parts[0].trim(), parts[1].trim(), { preset: true })
+        self.cookie(parts[0], decodeURIComponent(parts[1]), { preset: true })
       })    
     }
   },
