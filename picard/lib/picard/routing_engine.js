@@ -42,7 +42,7 @@ var routes = {
       
       if(param_keys)
         for(var i=0, l = param_keys.length; i < l; i++)
-          keys[keys.length] = param_keys[i].replace(':', '')
+          keys[keys.length] = param_keys[i].replace(/^:/, '')
     }
     
     return {
