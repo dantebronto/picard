@@ -5,7 +5,7 @@ var routes = {
     
     for(var i=0, l = routes_for_rest_type.length; i < l; i++){
       var route = routes_for_rest_type[i]
-      var matches = request.uri.path.match(route.path)
+      var matches = request.parsed_url().pathname.match(route.path)
 
       if( matches ){ // incoming request matches route
         request.extract_route_params(route, matches)

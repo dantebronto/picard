@@ -1,9 +1,10 @@
 var sys = require('sys')
+var url = require('url')
 var posix = require('posix')
 var haml = require('./haml')
 
 var request_extensions = {
-  
+
   extract_form_params: function(chunk){
     if( chunk == undefined ) { return }
     var chunks = decodeURIComponent(chunk).split('&')
@@ -25,6 +26,19 @@ var request_extensions = {
     for(i=0, l = match_data.length; i < l; i++)
       this.captures[i] = match_data[i]
   },
+
+  parsed_url: function() {
+    // Can't write a getter, because node's process.mixin doesn't support them.
+    if (!('url' in this))
+      return;
+    var parsed = url.parse(this.url);
+    sys.puts(parsed.pathname);
+    sys.puts(parsed.href);
+    this.parsed_url = function() {
+      return parsed;
+    };
+    return parsed;
+  },
   
   resolve: function(){
     var scope = picard.routes.execute_callback(this)
@@ -39,7 +53,7 @@ var request_extensions = {
   
   serve_static: function(file){
     var request = this
-    var filename = file || picard.env.root + picard.env.public_dir + this.uri.path
+    var filename = file || picard.env.root + picard.env.public_dir + this.parsed_url().pathname
     
     // non-blocking static file access
     posix.cat(filename, 'binary').addCallback(function(content){
@@ -83,7 +97,7 @@ var request_extensions = {
 
     req.build_document(scope)
     
-    sys.puts((this._method || this.method).toUpperCase() + ' ' + this.uri.path + ' ' + scope.status)
+    sys.puts((this._method || this.method).toUpperCase() + ' ' + this.parsed_url().pathname + ' ' + scope.status)
     
     if(picard.env.mode == 'development')
       sys.puts(sys.inspect(this) + '\n') // request params logging

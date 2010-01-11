@@ -146,7 +146,7 @@ get('/async_example', function(params){
 // function for evaluation:
 
 var authorized = function(request){
-  return (request.uri.path == '/holodeck') // very simple example
+  return (request.parsed_url().pathname == '/holodeck') // very simple example
 }
 
 get('/holodeck', function(request){
