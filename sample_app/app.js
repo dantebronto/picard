@@ -122,8 +122,8 @@ get('/multiple/:thing/:stuff', function(params){
 get('/async_example', function(params){
   
   // This could easily be a call to CouchDB or other service
-  var local = require('http').createClient(9900, "localhost")
-  var request = local.get("/haml", { "host": "localhost" })
+  var local = require('http').createClient(9900, 'localhost')
+  var request = local.request('GET', '/haml', { 'host': 'localhost' })
   
   request.finish(function(response) {
     var body = ''
