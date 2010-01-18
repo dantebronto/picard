@@ -36,10 +36,13 @@ var routes = {
     var keys = []
     
     if(path.constructor != RegExp){ // assume to be a String
-      var full_route = '^'+path+'$'
-      var param_keys = path.match(/:[^/]*/g)
-      path = new RegExp(full_route.replace(/:[^/]*/g, '([^/]*)'))
-      
+      var full_route = '^'+path+'/?$'
+      var param_keys = path.match(/:[^/]+/g)
+      regexp_as_string = full_route.replace(/([^\*]):[^/]+/g, '$1([^/]+)')
+      if (param_keys && path.match(/\*:\w+$/)) {
+        regexp_as_string = regexp_as_string.replace(/\*.+/, '(.+)')
+      }
+      path = new RegExp(regexp_as_string);
       if(param_keys)
         for(var i=0, l = param_keys.length; i < l; i++)
           keys[keys.length] = param_keys[i].replace(/^:/, '')

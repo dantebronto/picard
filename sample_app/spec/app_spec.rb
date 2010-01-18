@@ -22,7 +22,13 @@ describe 'GET' do
     res.body_str.should include('<div id="title">Title: Captain of the USS Enterprise</div>')
     res.header_str.should include('200')
   end
-  
+
+  it "shouldn't be bothered by trailing slashes" do
+    res = Curl::Easy.perform(base_url + '/haml/')
+    res.body_str.should include('<div id="name">Name: Jean-Luc Picard</div>')
+    res.header_str.should include('200')
+  end
+
   it 'should render json' do
     res = Curl::Easy.perform(base_url + '/json')
     res.body_str.should include("[{\"command\":\"Make it so\"},{\"command\":\"You have the bridge, Number One\"}]")
@@ -129,4 +135,11 @@ describe 'static assets' do
     res.header_str.should include('application/javascript')
   end
   
+end
+
+describe 'globbing' do
+  it "should slurp the remainder of the url" do
+    res = Curl::Easy.perform(base_url + '/foo/bar/Ive/Been/Slurped')
+    res.body_str.should eql("Globbed params for 'baz': Ive/Been/Slurped")
+  end
 end

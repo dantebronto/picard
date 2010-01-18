@@ -155,3 +155,7 @@ get('/holodeck', function(request){
   else
     return request.redirect('/')
 })
+
+get('/foo/bar/*:baz', function(params) {
+  return {text: "Globbed params for 'baz': " + params.baz}
+})
