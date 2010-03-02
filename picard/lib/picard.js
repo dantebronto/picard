@@ -8,9 +8,9 @@ picard.start = function() {
     process.mixin(request, req_ex.get_extensions())
     request.response = response
     
-    request.addListener('body', request.extract_form_params)
+    request.addListener('data', request.extract_form_params)
     
-    request.addListener('complete', function(){
+    request.addListener('end', function(){
       request.parse_cookies()
       request.resolve()
     })

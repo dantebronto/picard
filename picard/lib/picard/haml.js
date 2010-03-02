@@ -3,7 +3,7 @@
     nomen: true, plusplus: true, regexp: true, undef: true, white: true, indent: 2 */
 /*globals */
 
-var posix = require('posix')
+var fs = require('fs')
 
 function Haml() {}
 
@@ -344,7 +344,7 @@ Haml.parse = function (text) {
       
       if ( partial_match ){ // TODO: fix partial calls in "foreach", must be evaluated immediately
         var file = picard.env.root + picard.env.views + '/' + partial_match[1] + '.haml'
-        posix.cat(file).addCallback(function(body){
+        fs.readFile(file).addCallback(function(body){
           contents = contents.replace(partial_match[0], body)
         }).wait()
       }

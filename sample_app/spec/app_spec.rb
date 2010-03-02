@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 
 
 describe 'GET' do
-  
+    
   it 'should do gets' do
     res = Curl::Easy.perform(base_url + '/')
     res.body_str.should eql("Hello Universe")
@@ -133,6 +133,13 @@ describe 'static assets' do
     res = Curl::Easy.perform(base_url + '/static.js')
     res.body_str.should include('alert')
     res.header_str.should include('application/javascript')
+  end
+  
+  it 'should serve images' do
+    res = Curl::Easy.perform(base_url + '/picard.jpg')
+    img_bin = "\377\330\377\340\000\020JFIF\000\001\001\000\000\001\000\001\000\000\377\376\000>CREATOR: gd-jpeg v1.0 (using IJG JPEG v62), default quality\n\377\333\000C\000\b"
+    res.body_str.include?(img_bin).should be_true
+    res.header_str.should include('image/jpeg')
   end
   
 end

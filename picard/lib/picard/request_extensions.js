@@ -1,6 +1,6 @@
 var sys = require('sys')
 var url = require('url')
-var posix = require('posix')
+var fs = require('fs')
 var haml = require('./haml')
 
 var request_extensions = {
@@ -32,8 +32,6 @@ var request_extensions = {
     if (!('url' in this))
       return;
     var parsed = url.parse(this.url);
-    sys.puts(parsed.pathname);
-    sys.puts(parsed.href);
     this.parsed_url = function() {
       return parsed;
     };
@@ -54,25 +52,26 @@ var request_extensions = {
   serve_static: function(file){
     var request = this
     var filename = file || picard.env.root + picard.env.public_dir + this.parsed_url().pathname
-    
+
     // non-blocking static file access
-    posix.cat(filename, 'binary').addCallback(function(content){
+    fs.readFile(filename, "binary", function(err, content){
+      if ( err ) request.on_screen(null)
+      
       request.on_screen({ 
         body: content, 
         type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0]),
         encoding: 'binary'
       })
-    }).addErrback(function(){
-      request.on_screen(null) 
     })
     
   },
   
   send_data: function(scope){
     scope.headers.push([ 'Content-Length', scope.body.length ])
-    this.response.sendHeader(scope.status, scope.headers)
-    this.response.sendBody(scope.body, scope.encoding)
-    this.response.finish()
+    scope.headers.push([ 'Content-Encoding', scope.encoding ])
+    this.response.writeHeader(scope.status, scope.headers)
+    this.response.write(scope.body, scope.encoding)
+    this.response.close()
   },
   
   on_screen: function(scope){    
@@ -89,7 +88,7 @@ var request_extensions = {
     scope.status   = scope.status   || 200
     scope.headers  = scope.headers  || []
     scope.body     = scope.text     || scope.body || ''
-    scope.encoding = scope.encoding || 'ascii'
+    scope.encoding = scope.encoding || 'utf8'
     
     scope.headers.push([ 'Server', picard.env.server || 'Picard v0.1 "Prime Directive"' ])
     scope.headers.push([ 'Content-Type', scope.type  || 'text/html' ])
@@ -175,21 +174,22 @@ var request_extensions = {
     
     if ( partial && partial[1] ){ // template w/ partial
       filename = basepath + partial[1] + '.haml'
-      posix.cat(filename).addCallback(function(body){
+      fs.readFile(filename).addCallback(function(body){
         var partial_content = haml.render(scope, body)
         scope.body = scope.body.replace(partial[0], partial_content)
         req.build_document(scope)
       })
     } else if ( scope.template ) { // first run w/ template
       filename = basepath + scope.template + '.haml'
-      posix.cat(filename).addCallback(function(body){
+      
+      fs.readFile(filename, function(err, body){
         scope.body = haml.render(scope, body)
         delete scope.template
         req.build_document(scope)
       })
     } else if ( scope.layout ){ // layout first pass, after template + partials
       filename = basepath + scope.layout + '.haml'
-      posix.cat(filename).addCallback(function(layout){
+      fs.readFile(filename).addCallback(function(layout){
         var layout_content = haml.render(scope, layout)
         var yield = layout_content.match(/\=\=yield\(\)/)      
         if( yield )
