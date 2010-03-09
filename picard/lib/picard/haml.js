@@ -72,12 +72,11 @@ Haml.to_html = function (json) {
 }
 
 Haml.parse = function (text) {
-  
   var empty_regex = new RegExp("^[ \t]*$"),
       indent_regex = new RegExp("^ *"),
       element_regex = new RegExp("^(?::[a-z]+|(?:[%][a-z][a-z0-9]*)?(?:[#.][a-z0-9_-]+)*)", "i"),
       scope = this,
-      haml, element, stack, indent, buffer, old_indent, mode, last_insert;
+      haml, element, stack, indent, buffer, old_indent, mode, last_insert;    
       
   // Sortof an instance_eval for Javascript
   function instance_eval(input) {
@@ -342,11 +341,10 @@ Haml.parse = function (text) {
       var contents = element[1]
       var partial_match = contents.match(/\=.?partial\(\s*?['|"](.*)['|"]\s*?\)/)
       
-      if ( partial_match ){ // TODO: fix partial calls in "foreach", must be evaluated immediately
+      if ( partial_match ){ // partial calls in "foreach", must be evaluated immediately
         var file = picard.env.root + picard.env.views + '/' + partial_match[1] + '.haml'
-        fs.readFile(file).addCallback(function(body){
-          contents = contents.replace(partial_match[0], body)
-        }).wait()
+        body = fs.readFileSync(file)
+        contents = contents.replace(partial_match[0], body)
       }
       
       foreach_callback.call(this, element, contents)
@@ -362,7 +360,7 @@ Haml.parse = function (text) {
   parse_push(); // Prime the pump so we can have multiple root elements
   indent = 0;
   old_indent = indent;
-  
+
   var lines = text.split("\n"),
       line, line_index, line_count;
       

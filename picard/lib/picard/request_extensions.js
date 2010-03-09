@@ -171,10 +171,10 @@ var request_extensions = {
     var partial = scope.body.match(/\=\=partial\('(.*)'\)/)
     var req = this
     var filename
-    
+
     if ( partial && partial[1] ){ // template w/ partial
       filename = basepath + partial[1] + '.haml'
-      fs.readFile(filename).addCallback(function(body){
+      fs.readFile(filename, function(err, body){
         var partial_content = haml.render(scope, body)
         scope.body = scope.body.replace(partial[0], partial_content)
         req.build_document(scope)
@@ -189,7 +189,7 @@ var request_extensions = {
       })
     } else if ( scope.layout ){ // layout first pass, after template + partials
       filename = basepath + scope.layout + '.haml'
-      fs.readFile(filename).addCallback(function(layout){
+      fs.readFile(filename, function(err, layout){
         var layout_content = haml.render(scope, layout)
         var yield = layout_content.match(/\=\=yield\(\)/)      
         if( yield )
