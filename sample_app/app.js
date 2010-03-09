@@ -120,24 +120,18 @@ get('/multiple/:thing/:stuff', function(params){
 // Only when the GET has returned do we render the result via the 'on_screen' method.
 
 get('/async_example', function(params){
-  
-  // This could easily be a call to CouchDB or other service
   var local = require('http').createClient(9900, 'localhost')
-  var request = local.request('GET', '/haml', { 'host': 'localhost' })
+  var request = local.request('GET', '/haml', {'host': 'localhost'})
+  var body = ''  
   
-  request.finish(function(response) {
-    var body = ''
-    
-    response.addListener('body', function (chunk) {
+  request.addListener('response', function (response) {  
+    response.addListener('data', function (chunk) {
       body += chunk
     })
-    
-    // Here we call on_screen manually when the request is complete.
-    // We can pass the normal scope object with body, status, template, etc.
-    response.addListener('complete', function(){
+    response.addListener('end', function(){
       params.on_screen({ body: body })
     })
-  })
+  }).close()
 })
 
 // You can also use helper functions for logic that is shared across routes.
