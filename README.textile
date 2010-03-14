@@ -2,7 +2,7 @@ h1. Picard: A Micro-framework for node.js
 
 p. If you want to check it out, install "Node":http://nodejs.org and start the sample app with `node app.js`. There are no other dependencies. 
 
-!http://bloglikepattern.com/images/picard.png!
+!http://crawwwl.com/images/picard.png!
 
 p. Picard uses Haml thanks to creationix's haml-js project.
 
