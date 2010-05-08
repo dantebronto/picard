@@ -120,7 +120,7 @@ p. A sample application:
       response.addListener('end', function(){
         params.on_screen({ body: body })
       })
-    }).close()
+    }).end()
   })
   
   // You can also use helper functions for logic that is shared across routes.

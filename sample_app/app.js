@@ -131,7 +131,7 @@ get('/async_example', function(params){
     response.addListener('end', function(){
       params.on_screen({ body: body })
     })
-  }).close()
+  }).end()
 })
 
 // You can also use helper functions for logic that is shared across routes.
