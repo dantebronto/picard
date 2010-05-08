@@ -50,8 +50,12 @@ var request_extensions = {
   
   serve_static: function(file){
     var request = this
-    var filename = file || picard.env.root + picard.env.public_dir + this.parsed_url().pathname
-
+    var name = this.parsed_url().pathname
+    var filename = file || picard.env.root + picard.env.public_dir + name
+    
+    if( name == '/' ) // look for index.html if no action defined for '/'
+      filename = picard.env.root + picard.env.public_dir + '/index.html'
+    
     // non-blocking static file access
     fs.readFile(filename, "binary", function(err, content){
       if ( err ) request.on_screen(null)
