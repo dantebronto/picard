@@ -178,7 +178,7 @@ var request_extensions = {
     if ( partial && partial[1] ){ // template w/ partial
       filename = basepath + partial[1] + '.haml'
       fs.readFile(filename, function(err, body){
-        var partial_content = haml.render(scope, body)
+        var partial_content = haml.render(scope, body.toString())
         scope.body = scope.body.replace(partial[0], partial_content)
         req.build_document(scope)
       })
@@ -186,14 +186,14 @@ var request_extensions = {
       filename = basepath + scope.template + '.haml'
       
       fs.readFile(filename, function(err, body){
-        scope.body = haml.render(scope, body)
+        scope.body = haml.render(scope, body.toString())
         delete scope.template
         req.build_document(scope)
       })
     } else if ( scope.layout ){ // layout first pass, after template + partials
       filename = basepath + scope.layout + '.haml'
       fs.readFile(filename, function(err, layout){
-        var layout_content = haml.render(scope, layout)
+        var layout_content = haml.render(scope, layout.toString())
         var yield = layout_content.match(/\=\=yield\(\)/)      
         if( yield )
           scope.body = layout_content.replace(yield, scope.body)
