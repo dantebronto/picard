@@ -1,19 +1,17 @@
 require('./config/env')
 
-get('/', function(){
-  return { text: 'Hello Universe' }
-})
+var require_dir = function(dir){
+  require('fs').readdir(dir, function(err, files){
+    for(var i=0, l = files.length; i<l; i++)
+      require(dir + files[i].replace(/.js$/, ''))
+  })
+}
 
-get('/haml', function(){
-  return {
-    template: 'index',
-    print_date: function () {
-      return (new Date()).toDateString();
-    },
-    current_user: {
-      name: "Jean-Luc Picard",
-      bio: "Captain of the USS Enterprise"
-    }
+require_dir('./controllers/')
+
+helpers({
+  bark: function(){
+    return "Bark!"
   }
 })
 

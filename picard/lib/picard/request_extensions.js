@@ -38,8 +38,8 @@ var request_extensions = {
   },
   
   resolve: function(){
-    var scope = picard.routes.execute_callback(this)
-    
+    var scope = Picard.routes.execute_callback(this)
+
     if( scope == 'static' )
       scope = this.serve_static()
     if ( scope == null )
@@ -51,10 +51,10 @@ var request_extensions = {
   serve_static: function(file){
     var request = this
     var name = this.parsed_url().pathname
-    var filename = file || picard.env.root + picard.env.public_dir + name
+    var filename = file || Picard.env.root + Picard.env.public_dir + name
     
     if( name == '/' ) // look for index.html if no action defined for '/'
-      filename = picard.env.root + picard.env.public_dir + '/index.html'
+      filename = Picard.env.root + Picard.env.public_dir + '/index.html'
     
     // non-blocking static file access
     fs.readFile(filename, "binary", function(err, content){
@@ -62,7 +62,7 @@ var request_extensions = {
       
       request.on_screen({ 
         body: content, 
-        type: picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0]),
+        type: Picard.mime.lookup_extension(filename.match(/.[^.]*$/)[0]),
         encoding: 'binary'
       })
     })
@@ -93,7 +93,7 @@ var request_extensions = {
     scope.body     = scope.text     || scope.body || ''
     scope.encoding = scope.encoding || 'utf8'
     
-    scope.headers.push([ 'Server', picard.env.server || 'Picard v0.1 "Prime Directive"' ])
+    scope.headers.push([ 'Server', Picard.env.server || 'Picard v0.1 "Prime Directive"' ])
     scope.headers.push([ 'Content-Type', scope.type  || 'text/html' ])
     scope.headers = req.set_cookies(scope.headers)
 
@@ -101,7 +101,7 @@ var request_extensions = {
     
     sys.puts((this._method || this.method).toUpperCase() + ' ' + this.parsed_url().pathname + ' ' + scope.status)
     
-    if(picard.env.mode == 'development')
+    if(Picard.env.mode == 'development')
       sys.puts(sys.inspect(this) + '\n') // request params logging
   },
   
@@ -169,12 +169,23 @@ var request_extensions = {
     }
   },
   
+  extend_scope: function(scope, extension){
+    var props = Object.keys(extension)
+    for (i = 0, l = props.length; i < l; i += 1)
+      if ( !scope[props[i]] ) scope[props[i]] = extension[props[i]]
+    return scope
+  },
+  
   build_document: function(scope){
-    var basepath = picard.env.root + picard.env.views + '/'
+    if ( this.route && this.route.route_set )
+      scope = this.extend_scope(scope, this.route.route_set.helpers_cache) // mixin any helpers within a route set
+    scope = this.extend_scope(scope, helpers()) // mixin any global helpers 
+    
+    var basepath = Picard.env.root + Picard.env.views + '/'
     var partial = scope.body.match(/\=\=partial\('(.*)'\)/)
     var req = this
     var filename
-
+    
     if ( partial && partial[1] ){ // template w/ partial
       filename = basepath + partial[1] + '.haml'
       fs.readFile(filename, function(err, body){

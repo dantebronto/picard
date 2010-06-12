@@ -1,6 +1,6 @@
 var mime = {
   lookup_extension : function(ext) {
-    return picard.mime.TYPES[ext.toLowerCase()];
+    return Picard.mime.TYPES[ext.toLowerCase()];
   },
   TYPES : // List of most common mime-types, stolen from Rack.
     { ".3gp" : "video/3gpp"
@@ -171,4 +171,4 @@ var mime = {
     }
 };
 
-picard.mime = mime
+Picard.mime = mime

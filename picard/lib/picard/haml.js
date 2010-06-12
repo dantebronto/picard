@@ -342,7 +342,7 @@ Haml.parse = function (text) {
       var partial_match = contents.match(/\=.?partial\(\s*?['|"](.*)['|"]\s*?\)/)
       
       if ( partial_match ){ // partial calls in "foreach", must be evaluated immediately
-        var file = picard.env.root + picard.env.views + '/' + partial_match[1] + '.haml'
+        var file = Picard.env.root + Picard.env.views + '/' + partial_match[1] + '.haml'
         body = fs.readFileSync(file)
         contents = contents.replace(partial_match[0], body)
       }

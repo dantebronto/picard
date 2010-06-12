@@ -2,15 +2,17 @@ var routes = {
   
   execute_callback: function(request){
     var routes_for_rest_type = routes.rest_type(request)
+    var route, matches
     
     for(var i=0, l = routes_for_rest_type.length; i < l; i++){
-      var route = routes_for_rest_type[i]
-      var matches = request.parsed_url().pathname.match(route.path)
-
+      route = routes_for_rest_type[i]
+      matches = request.parsed_url().pathname.match(route.path)
+      
       if( matches ){ // incoming request matches route
         request.extract_route_params(route, matches)
         try {
-          return route.handler(request)
+          request.route = route
+          return route.handler(request) // call programmer defined action
         } catch(ex) {
           request.handle_exception(ex)
         }
@@ -18,7 +20,7 @@ var routes = {
     }
     return 'static'
   },
-
+  
   rest_type: function(request){
     var route_array = []
     var rest_method = (request._method || request.method).toUpperCase()
@@ -32,7 +34,7 @@ var routes = {
     return route_array
   },
   
-  add: function(path, handler){
+  add: function(path, handler, route_set){
     var keys = []
     
     if(path.constructor != RegExp){ // assume to be a String
@@ -51,29 +53,60 @@ var routes = {
     return {
       path: path,
       handler: handler,
-      keys: keys 
+      keys: keys,
+      route_set: route_set
     } 
   }
   
 }
 
 var get_routes = []
+GLOBAL.get = function(path, handler){ /* optional param: [, route_set] */
+  return get_routes.push(routes.add(path, handler, arguments[2]))
+}
+
 var post_routes = []
-var put_routes = []
-var delete_routes = []
-
-GLOBAL.get = function(path, handler){
-  get_routes.push(routes.add(path, handler))
-}
 GLOBAL.post = function(path, handler){
-  post_routes.push(routes.add(path, handler))
-}
-GLOBAL.put = function(path, handler){
-  put_routes.push(routes.add(path, handler))
-}
-GLOBAL.del = function(path, handler){
-  delete_routes.push(routes.add(path, handler))
+  return post_routes.push(routes.add(path, handler, arguments[2]))
 }
 
-picard = exports
-picard.routes = routes
+var put_routes = []
+GLOBAL.put = function(path, handler){
+  return put_routes.push(routes.add(path, handler, arguments[2]))
+}
+
+var delete_routes = []
+GLOBAL.del = function(path, handler){
+  return delete_routes.push(routes.add(path, handler, arguments[2]))
+}
+
+var global_helpers = {} /* for getting and setting shared helpers outside of a route_set */
+GLOBAL.helpers = function(obj){
+  if ( obj ) global_helpers = obj; return global_helpers
+}
+
+var route_set_cache = {}
+GLOBAL.route_set = function(name, handler){
+  var route_set_scope = {
+    name: name,
+    path_prefix: '',
+    helpers: function(obj){ if( obj ) this.helpers_cache = obj; return this.helpers_cache },
+    get:  function(path, handler){ GLOBAL.get( this.path_prefix + path, handler, this) },
+    post: function(path, handler){ GLOBAL.post(this.path_prefix + path, handler, this) },
+    put:  function(path, handler){ GLOBAL.put( this.path_prefix + path, handler, this) },
+    del:  function(path, handler){ GLOBAL.del( this.path_prefix + path, handler, this) },
+    helpers_cache: {},
+    _handler: handler
+  }
+  if( handler ){
+    route_set_cache[name] = route_set_scope
+    handler.apply(route_set_scope)
+  }
+}
+
+GLOBAL.route_sets = function(){
+  return route_set_cache
+}
+
+Picard = picard = exports
+Picard.routes = routes

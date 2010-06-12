@@ -18,9 +18,9 @@ picard.start = function() {
       request.parse_cookies()
       request.resolve()
     })
-  }).listen(picard.env.port)
+  }).listen(Picard.env.port)
 
   require('sys').
-    puts('Starting in ' + picard.env.mode + ' mode.\n' +
-         'Picard boldly goes on port ' + picard.env.port + '...')
+    puts('Starting in ' + Picard.env.mode + ' mode.\n' +
+         'Picard boldly goes on port ' + Picard.env.port + '...')
 }

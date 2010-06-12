@@ -1,11 +1,11 @@
 require('../../picard/lib/picard')
 
-picard.env = {
+Picard.env = {
  root: __filename.replace(/\/config\/env.js$/, ''),
- mode: 'production',
+ mode: 'development', /* Picard currently only cares about production and development modes */
  port: 9900,
  public_dir: '/public',
  views: '/views'
 }
 
-picard.start()
+Picard.start()
