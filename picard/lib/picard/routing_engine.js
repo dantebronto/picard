@@ -9,7 +9,7 @@ var routes = {
       matches = request.parsed_url().pathname.match(route.path)
       
       if( matches ){ // incoming request matches route
-        request._extract_route_params(route, matches)
+        Picard.private_request_functions._extract_route_params.call(request, route, matches)
         try {
           request.route = route
           return route.handler(request) // call programmer defined action
@@ -87,6 +87,11 @@ GLOBAL.helpers = function(obj){
 
 var route_set_cache = {}
 GLOBAL.route_set = function(name, handler){
+  if ( typeof name == 'function' ){
+    handler = name
+    name = name.toString()
+  }
+  
   var route_set_scope = {
     name: name,
     path_prefix: '',

@@ -1,13 +1,13 @@
-route_set('Operations Routes', function(){
+route_set(function(){
   
   var ops = this;
   ops.path_prefix = '/ops'
   
-  // ops.helpers({
-  //   bark: function(){
-  //     return "App is running" 
-  //   }
-  // })
+  ops.helpers({
+    bark: function(){
+      return "App is running" 
+    }
+  })
   
   // GET /ops/heartbeat
   ops.get('/heartbeat', function(){

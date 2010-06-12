@@ -9,11 +9,24 @@ var require_dir = function(dir){
 
 require_dir('./controllers/')
 
-// helpers({
-//   bark: function(){
-//     return "Bark!"
-//   }
-// })
+helpers({
+  bark: function(){
+    return "Bark!"
+  }
+})
+
+get('/haml2', function(){
+  return {
+    template: 'index',
+    print_date: function () {
+      return (new Date()).toDateString();
+    },
+    current_user: {
+      name: "Jean-Luc Picard",
+      bio: "Captain of the USS Enterprise"
+    }
+  }
+})
 
 var commands = [ 
   { command: 'Make it so' }, 

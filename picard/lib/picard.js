@@ -3,23 +3,24 @@ require('./picard/routing_engine')
 require('./picard/mime_types')
 require('./picard/utils')
 
-// function extend(a,b){
-//   var props = Object.keys(b)
-//   for (i = 0, l = props.length; i < l; i += 1) 
-//     a[props[i]] = b[props[i]]
-//   return a
-// }
-
-Picard.merge({
+Picard.merge({  
   start: function() {
+    var locals = Picard.private_request_functions
+    
     require('http').createServer(function(request, response) {
+      
       Picard.merge(request, Picard.request_extensions)
       request.response = response
-      request.addListener('data', request._extract_form_params)
-      request.addListener('end', function(){
-        request._parse_cookies()
-        request._resolve()
+      
+      request.addListener('data', function(chunk){ 
+        locals._extract_form_params.call(request, chunk)
       })
+      
+      request.addListener('end', function(){
+        locals._parse_cookies.call(request)
+        locals._resolve.call(request)
+      })
+      
     }).listen(Picard.env.port)
     
     require('sys').
