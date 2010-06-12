@@ -4,17 +4,93 @@ var fs = require('fs')
 var haml = require('./haml')
 
 var request_extensions = {
-
-  extract_form_params: function(chunk){
-    if( chunk == undefined ) { return }
-    var chunks = chunk.toString().replace(/\+/g, '%20').split('&')
-    for(var i in chunks){
-      var k_v = chunks[i].split('=')
-      this[k_v[0]] = decodeURIComponent(k_v[1])
+  _build_document: function(scope){
+    // res = Picard.extend({}, this.route.route_set.helpers_cache, scope)
+    // if ( this.route && this.route.route_set )
+    //   
+    //   this._extend_scope(scope, this.route.route_set.helpers_cache) // mixin any helpers within a route set
+    //this._extend_scope(scope, helpers()) // mixin any global helpers 
+    // Picard.extend(scope, helpers())
+    // require('sys').puts(require('sys').inspect(scope))
+    // kellen = Picard.extend({}, helpers(), scope)
+    //     require('sys').puts(require('sys').inspect(kellen))
+    //     
+    // scope = Picard.extend(scope, helpers())
+    
+    // try{
+    //   var obj = Picard.extend({}, {foo: 'bar'}, {that: 'this'})
+    //   require('sys').puts(require('sys').inspect(obj))
+    // }
+    // catch(ex){ this.handle_exception(ex) }
+    
+    if ( !scope.body ) this.send_data({}) // 500 caught, end request
+    
+    var basepath = Picard.env.root + Picard.env.views + '/'
+    var partial = scope.body.match(/\=\=partial\('(.*)'\)/)
+    var req = this
+    var filename
+    
+    if ( partial && partial[1] ){ // template w/ partial
+      filename = basepath + partial[1] + '.haml'
+      fs.readFile(filename, function(err, body){
+        var partial_content = locals._safe_render.call(req, scope, body)
+        scope.body = scope.body.replace(partial[0], partial_content)
+        req._build_document(scope)
+      })
+    } else if ( scope.template ) { // first run w/ template
+      filename = basepath + scope.template + '.haml'
+      
+      fs.readFile(filename, function(err, body){
+        scope.body = locals._safe_render.call(req, scope, body)
+        delete scope.template
+        req._build_document(scope)
+      })
+    } else if ( scope.layout ){ // layout first pass, after template + partials
+      filename = basepath + scope.layout + '.haml'
+      fs.readFile(filename, function(err, layout){
+        var layout_content = locals._safe_render.call(req, scope, layout)
+        var yield = layout_content.match(/\=\=yield\(\)/)      
+        if( yield )
+          scope.body = layout_content.replace(yield, scope.body)
+        delete scope.layout
+        req._build_document(scope)
+      })
+    } else { // document done
+      req.send_data(scope)
     }
   },
   
-  extract_route_params: function(route, match_data){
+  _parse_cookies: function(){
+    try {
+      this.cookies = {}
+      var self = this
+      var cookieHeader = self.headers["cookie"]
+      if (cookieHeader){
+        
+        cookieHeader.split("; ").forEach(function(cookie){
+          var parts = cookie.split("=")
+          self.cookie(parts[0], decodeURIComponent(parts[1]), { preset: true })
+        })
+      }
+    } catch(ex) {
+      this.handle_exception(ex)
+    }
+  },
+  
+  _extract_form_params: function(chunk){
+    try {
+      if( chunk == undefined ) { return }
+      var chunks = chunk.toString().replace(/\+/g, '%20').split('&')
+      for(var i in chunks){
+        var k_v = chunks[i].split('=')
+        this[k_v[0]] = decodeURIComponent(k_v[1])
+      }
+    } catch(ex) {
+      this.handle_exception(ex)
+    }
+  },
+  
+  _extract_route_params: function(route, match_data){
     var i, l
     
     if( match_data == null ){ return } else { match_data.shift() }
@@ -26,7 +102,45 @@ var request_extensions = {
     for(i=0, l = match_data.length; i < l; i++)
       this.captures[i] = match_data[i]
   },
+  
+  _set_cookies: function(headers){
+    var ret, name, options
+    
+    for(name in this.cookies) {
+      if( this.cookies[name].preset ){ continue }
+      options = this.cookies[name]
+      ret = name + '=' + encodeURIComponent(options.value)
+      
+      if (options.expires)
+        ret += '; expires=' + options.expires.toUTCString()
+      if (options.path)
+        ret += '; path=' + options.path
+      if (options.domain)
+        ret += '; domain=' + options.domain
+      if (options.secure)
+        ret += '; secure'
+      
+      headers.push([ "Set-Cookie", ret ])
+    }
+    return headers
+  },
+  
+  _resolve: function(){
+    try {
+      var scope = Picard.routes.execute_callback(this)
 
+      if( scope == 'static' )
+        scope = this.serve_static()
+      if ( scope == null )
+        return
+      
+      this.on_screen(scope)
+    } catch(ex) {
+      this.handle_exception(ex)
+    }
+
+  },
+  
   parsed_url: function() {
     if (!('url' in this))
       return;
@@ -35,17 +149,6 @@ var request_extensions = {
       return parsed;
     };
     return parsed;
-  },
-  
-  resolve: function(){
-    var scope = Picard.routes.execute_callback(this)
-
-    if( scope == 'static' )
-      scope = this.serve_static()
-    if ( scope == null )
-      return
-
-    this.on_screen(scope) 
   },
   
   serve_static: function(file){
@@ -70,6 +173,7 @@ var request_extensions = {
   },
   
   send_data: function(scope){
+    if( !scope.body ) return
     scope.headers.push([ 'Content-Length', scope.body.length ])
     scope.headers.push([ 'Content-Encoding', scope.encoding ])
     this.response.writeHeader(scope.status, scope.headers)
@@ -95,10 +199,10 @@ var request_extensions = {
     
     scope.headers.push([ 'Server', Picard.env.server || 'Picard v0.1 "Prime Directive"' ])
     scope.headers.push([ 'Content-Type', scope.type  || 'text/html' ])
-    scope.headers = req.set_cookies(scope.headers)
+    scope.headers = req._set_cookies(scope.headers)
 
-    req.build_document(scope)
-    
+    req._build_document(scope)
+
     sys.puts((this._method || this.method).toUpperCase() + ' ' + this.parsed_url().pathname + ' ' + scope.status)
     
     if(Picard.env.mode == 'development')
@@ -126,41 +230,6 @@ var request_extensions = {
     this.cookies[name] = options
   },
   
-  set_cookies: function(headers){
-    var ret, name, options
-    
-    for(name in this.cookies) {
-      if( this.cookies[name].preset ){ continue }
-      options = this.cookies[name]
-      ret = name + '=' + encodeURIComponent(options.value)
-      
-      if (options.expires)
-        ret += '; expires=' + options.expires.toUTCString()
-      if (options.path)
-        ret += '; path=' + options.path
-      if (options.domain)
-        ret += '; domain=' + options.domain
-      if (options.secure)
-        ret += '; secure'
-      
-      headers.push([ "Set-Cookie", ret ])
-    }
-    return headers
-  },
-  
-  parse_cookies: function(){
-    this.cookies = {}
-    var self = this
-    var cookieHeader = self.headers["cookie"]
-    
-    if (cookieHeader){
-      cookieHeader.split("; ").forEach(function(cookie){
-        var parts = cookie.split("=")
-        self.cookie(parts[0], decodeURIComponent(parts[1]), { preset: true })
-      })    
-    }
-  },
-  
   redirect: function(location){
     return {  
       status: 302,
@@ -169,53 +238,26 @@ var request_extensions = {
     }
   },
   
-  extend_scope: function(scope, extension){
+  _extend_scope: function(scope, extension){
     var props = Object.keys(extension)
     for (i = 0, l = props.length; i < l; i += 1)
       if ( !scope[props[i]] ) scope[props[i]] = extension[props[i]]
     return scope
-  },
-  
-  build_document: function(scope){
-    if ( this.route && this.route.route_set )
-      scope = this.extend_scope(scope, this.route.route_set.helpers_cache) // mixin any helpers within a route set
-    scope = this.extend_scope(scope, helpers()) // mixin any global helpers 
-    
-    var basepath = Picard.env.root + Picard.env.views + '/'
-    var partial = scope.body.match(/\=\=partial\('(.*)'\)/)
-    var req = this
-    var filename
-    
-    if ( partial && partial[1] ){ // template w/ partial
-      filename = basepath + partial[1] + '.haml'
-      fs.readFile(filename, function(err, body){
-        var partial_content = haml.render(scope, body.toString())
-        scope.body = scope.body.replace(partial[0], partial_content)
-        req.build_document(scope)
-      })
-    } else if ( scope.template ) { // first run w/ template
-      filename = basepath + scope.template + '.haml'
-      
-      fs.readFile(filename, function(err, body){
-        scope.body = haml.render(scope, body.toString())
-        delete scope.template
-        req.build_document(scope)
-      })
-    } else if ( scope.layout ){ // layout first pass, after template + partials
-      filename = basepath + scope.layout + '.haml'
-      fs.readFile(filename, function(err, layout){
-        var layout_content = haml.render(scope, layout.toString())
-        var yield = layout_content.match(/\=\=yield\(\)/)      
-        if( yield )
-          scope.body = layout_content.replace(yield, scope.body)
-        delete scope.layout
-        req.build_document(scope)
-      })
-    } else { // document done
-      req.send_data(scope)
-    }
   }
   
 }
 
-exports.get_extensions = function(){ return request_extensions }
+// private
+
+var locals = {
+  _safe_render: function(scope, body){
+    var ret_val
+    try{ ret_val = haml.render(scope, body.toString()) } 
+    catch(ex){ this.handle_exception(ex) }
+    return ret_val
+  }
+}
+
+//exports.get_extensions = function(){ return request_extensions }
+Picard = picard = exports
+Picard.request_extensions = request_extensions

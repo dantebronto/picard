@@ -3,15 +3,15 @@ route_set('Operations Routes', function(){
   var ops = this;
   ops.path_prefix = '/ops'
   
-  ops.helpers({
-    message: function(){
-      return "App is running" 
-    }
-  })
+  // ops.helpers({
+  //   bark: function(){
+  //     return "App is running" 
+  //   }
+  // })
   
   // GET /ops/heartbeat
   ops.get('/heartbeat', function(){
-    return { text: ops.helpers().message() }
+    return { text: 'hi' } //ops.helpers().message() }
   })
   
   // GET /ops/version

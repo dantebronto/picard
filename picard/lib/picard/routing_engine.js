@@ -9,7 +9,7 @@ var routes = {
       matches = request.parsed_url().pathname.match(route.path)
       
       if( matches ){ // incoming request matches route
-        request.extract_route_params(route, matches)
+        request._extract_route_params(route, matches)
         try {
           request.route = route
           return route.handler(request) // call programmer defined action
@@ -108,5 +108,4 @@ GLOBAL.route_sets = function(){
   return route_set_cache
 }
 
-Picard = picard = exports
 Picard.routes = routes

@@ -9,11 +9,11 @@ var require_dir = function(dir){
 
 require_dir('./controllers/')
 
-helpers({
-  bark: function(){
-    return "Bark!"
-  }
-})
+// helpers({
+//   bark: function(){
+//     return "Bark!"
+//   }
+// })
 
 var commands = [ 
   { command: 'Make it so' }, 

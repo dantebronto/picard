@@ -1,8 +1,8 @@
 route_set('test', function(){
   
-  this.helpers({
-    greet: function(){ return 'Why hello there' }
-  })
+  // this.helpers({
+  //   greet: function(){ return 'Why hello there' }
+  // })
   
   this.get('/', function(){
     return { text: 'Hello Universe' }
