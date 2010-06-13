@@ -95,7 +95,9 @@ var request_extensions = {
   }
 }
 
-// private stuff
+// private, does not need to be merged into request_extensions
+
+var template_cache = {}
 
 var locals = {
   _build_document: function(scope){
@@ -110,6 +112,15 @@ var locals = {
         req.send_data(scope)
       })
     })
+  },
+  _cached_template: function(filename, callback){
+    if ( template_cache[filename] )
+      callback(template_cache[filename])
+    else
+      fs.readFile(filename, function(err, body){
+        template_cache[filename] = haml(body.toString())
+        callback(template_cache[filename])
+      })
   },
   _extend_scope: function(scope){
     var shared_helpers = helpers()
@@ -179,17 +190,29 @@ var locals = {
       callback()
       return
     }
-    
     var req = this
     var basepath = Picard.env.root + Picard.env.views + '/'
     var filename = basepath + scope.layout + '.haml'
     
-    fs.readFile(filename, function(err, layout){
-      var layout_content = locals._safe_render.call(req, scope, layout)
-      var yield = layout_content.match(/\=\=yield\(\)/)      
-      if( yield ) scope.body = layout_content.replace(yield, scope.body)
+    locals._cached_template(filename, function(template){
+      var layout_content = locals._safe_render.call(req, template, scope)
+      var yield = layout_content.match(/\=\=yield\(\)/)
+      if ( yield ) scope.body = layout_content.replace(yield, scope.body)
       callback()
     })
+  },
+  _render_partial: function(name, scope, partial_scope){
+    var filename = Picard.env.root + Picard.env.views + '/' + name + '.haml'
+    var body
+    if ( typeof template_cache[filename] == 'undefined' ) {
+      body = fs.readFileSync(filename)
+      template_cache[filename] = haml(body.toString())
+    }
+    
+    var render_scope = scope
+    if( partial_scope ) render_scope = Picard.merge({}, scope, partial_scope)
+    body = locals._safe_render.call(this, template_cache[filename], render_scope)
+    return body
   },
   _render_template: function(scope, callback){
     if ( typeof scope.template != 'string' ) {
@@ -201,8 +224,8 @@ var locals = {
     var basepath = Picard.env.root + Picard.env.views + '/'
     var filename = basepath + scope.template + '.haml'
     
-    fs.readFile(filename, function(err, body){
-      scope.body = locals._safe_render.call(req, scope, body)
+    locals._cached_template(filename, function(template){
+      scope.body = locals._safe_render.call(req, template, scope)
       callback()
     })
   },
@@ -221,23 +244,12 @@ var locals = {
     }
 
   },
-  _safe_render: function(scope, body){
+  _safe_render: function(template, scope){
     var ret_val
     try{ 
-      var template = haml(body.toString())
       Picard.merge(scope, {
-        partial: function(name, partial_scope){ 
-          var file = Picard.env.root + Picard.env.views + '/' + name + '.haml'
-          var body = fs.readFileSync(file)
-          var render_scope = scope
-          
-          if( partial_scope ) render_scope = Picard.merge({}, scope, partial_scope)
-          body = Picard.private_request_functions._safe_render(render_scope, body)
-          return body
-        },
-        yield: function(name){
-          return "==yield()"
-        }
+        partial: function(name, partial_scope){ return locals._render_partial(name, scope, partial_scope) },
+        yield: function(name){ return "==yield()" }
       })
       ret_val = template(scope)
     } 
