@@ -1,16 +1,16 @@
 #page Advanced Haml Usage
   
-  :if{ condition: true }
+  :if true
     %p This will show up!
   
-  :if{ condition: 0 > 1 }
+  :if 0 > 1
     %p This will not show up!
 
   %ul.todolist
-    :foreach{ array: commands, value: "item" }
+    :each item in commands
       %li= item.command
 
-  // messages from global "helpers" call
+  =// messages from global "helpers" call
   #message
     = message()
   

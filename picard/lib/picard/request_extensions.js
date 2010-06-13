@@ -102,40 +102,14 @@ var locals = {
     var req = this
     scope = locals._extend_scope.call(req, scope)
     
-    if ( scope.body == undefined ) return // 500 caught, end request
+    if ( scope.body == undefined ) 
+      return // 500 caught, end request
     
-    var basepath = Picard.env.root + Picard.env.views + '/'
-    var partial = scope.body.match(/\=\=partial\('(.*)'\)/)
-    var filename
-    
-    if ( partial && partial[1] ){ // template w/ partial
-      filename = basepath + partial[1] + '.haml'
-      fs.readFile(filename, function(err, body){
-        var partial_content = locals._safe_render.call(req, scope, body)
-        scope.body = scope.body.replace(partial[0], partial_content)
-        locals._build_document.call(req, scope)
+    locals._render_template.call(req, scope, function(){
+      locals._render_layout.call(req, scope, function(){
+        req.send_data(scope)
       })
-    } else if ( scope.template ) { // first run w/ template
-      filename = basepath + scope.template + '.haml'
-      
-      fs.readFile(filename, function(err, body){
-        scope.body = locals._safe_render.call(req, scope, body)
-        delete scope.template
-        locals._build_document.call(req, scope)
-      })
-    } else if ( scope.layout ){ // layout first pass, after template + partials
-      filename = basepath + scope.layout + '.haml'
-      fs.readFile(filename, function(err, layout){
-        var layout_content = locals._safe_render.call(req, scope, layout)
-        var yield = layout_content.match(/\=\=yield\(\)/)      
-        if( yield )
-          scope.body = layout_content.replace(yield, scope.body)
-        delete scope.layout
-        locals._build_document.call(req, scope)
-      })
-    } else { // document done
-      req.send_data(scope)
-    }
+    })
   },
   _extend_scope: function(scope){
     var shared_helpers = helpers()
@@ -200,6 +174,38 @@ var locals = {
       this.handle_exception(ex)
     }
   },
+  _render_layout: function(scope, callback){
+    if ( typeof scope.layout != 'string' ){
+      callback()
+      return
+    }
+    
+    var req = this
+    var basepath = Picard.env.root + Picard.env.views + '/'
+    var filename = basepath + scope.layout + '.haml'
+    
+    fs.readFile(filename, function(err, layout){
+      var layout_content = locals._safe_render.call(req, scope, layout)
+      var yield = layout_content.match(/\=\=yield\(\)/)      
+      if( yield ) scope.body = layout_content.replace(yield, scope.body)
+      callback()
+    })
+  },
+  _render_template: function(scope, callback){
+    if ( typeof scope.template != 'string' ) {
+      callback()
+      return
+    }
+    
+    var req = this
+    var basepath = Picard.env.root + Picard.env.views + '/'
+    var filename = basepath + scope.template + '.haml'
+    
+    fs.readFile(filename, function(err, body){
+      scope.body = locals._safe_render.call(req, scope, body)
+      callback()
+    })
+  },
   _resolve: function(){
     try {
       var scope = Picard.routes.execute_callback(this)
@@ -217,7 +223,24 @@ var locals = {
   },
   _safe_render: function(scope, body){
     var ret_val
-    try{ ret_val = haml.render(scope, body.toString()) } 
+    try{ 
+      var template = haml(body.toString())
+      Picard.merge(scope, {
+        partial: function(name, partial_scope){ 
+          var file = Picard.env.root + Picard.env.views + '/' + name + '.haml'
+          var body = fs.readFileSync(file)
+          var render_scope = scope
+          
+          if( partial_scope ) render_scope = Picard.merge({}, scope, partial_scope)
+          body = Picard.private_request_functions._safe_render(render_scope, body)
+          return body
+        },
+        yield: function(name){
+          return "==yield()"
+        }
+      })
+      ret_val = template(scope)
+    } 
     catch(ex){ this.handle_exception(ex) }
     return ret_val
   },

@@ -6,11 +6,11 @@ p. If you want to check it out, install "Node":http://nodejs.org and start the s
 
 p. Picard uses Haml thanks to creationix's haml-js project.
 
-p. All the tests for Picard are high level integration style test. For right now, the test suite basically doubles as the documentation. Check the specs, or "the sample app":http://github.com/dantebronto/picard/blob/master/sample_app/app.js for examples of what is possible.
+p. All the tests for Picard are high level integration style tests. For right now, the test suite basically doubles as the documentation. Check the specs, or "the sample app":http://github.com/dantebronto/picard/blob/master/sample_app/app.js for examples of what is possible.
 
 h3. License
 
-Copyright (c) 2009 Kellen Presley
+Copyright (c) 2009-2010 Kellen Presley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
