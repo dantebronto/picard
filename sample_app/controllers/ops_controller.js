@@ -2,6 +2,7 @@ route_set('operations', function(){
   
   var ops = this;
   ops.path_prefix = '/ops'
+  ops.layout = 'application'
   
   ops.helpers({
     message: function(){
@@ -12,7 +13,7 @@ route_set('operations', function(){
   
   // GET /ops/heartbeat
   ops.get('/heartbeat', function(){
-    return { text: ops.helpers().message() } 
+    return { text: ops.helpers().message(), layout: 'alternate_layout' } 
   })
   
   // GET /ops/version

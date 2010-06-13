@@ -5,9 +5,9 @@ require('./picard/utils')
 
 Picard.merge({  
   start: function() {
-    var locals = Picard.private_request_functions
+    var locals = Picard.internal_request_functions
     
-    require('http').createServer(function(request, response) {
+    var server = require('http').createServer(function(request, response) {
       
       Picard.merge(request, Picard.request_extensions)
       request.response = response
@@ -21,7 +21,9 @@ Picard.merge({
         locals._resolve.call(request)
       })
       
-    }).listen(Picard.env.port)
+    })
+    
+    server.listen(Picard.env.port)
     
     require('sys').
       puts('Starting in ' + Picard.env.mode + ' mode.\n' +

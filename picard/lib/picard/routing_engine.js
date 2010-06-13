@@ -9,9 +9,9 @@ var routes = {
       matches = request.parsed_url().pathname.match(route.path)
       
       if( matches ){ // incoming request matches route
-        Picard.private_request_functions._extract_route_params.call(request, route, matches)
+        Picard.internal_request_functions._extract_route_params.call(request, route, matches)
         try {
-          request.route = route
+          request.route = route            
           return route.handler(request) // call programmer defined action
         } catch(ex) {
           request.handle_exception(ex)

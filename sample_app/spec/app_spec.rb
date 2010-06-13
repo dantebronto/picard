@@ -274,6 +274,17 @@ describe 'route sets' do
     res = Curl::Easy.perform(base_url + '/anonymous_route_two')
     res.body_str.should include("123")
   end
+  
+  it 'should accept a layout parameter for the entire route set' do
+    res = Curl::Easy.perform(base_url + '/ops/version')
+    res.body_str.should include("http://www.w3.org/1999/xhtml") # from the doctype in the layout
+  end
+  
+  it 'should allow you to override the route set template for a single route' do
+    res = Curl::Easy.perform(base_url + '/ops/heartbeat')
+    res.body_str.should include("this is another layout")
+    res.body_str.should include("for testing")
+  end
 end
 
 describe 'error handling' do

@@ -124,11 +124,16 @@ var locals = {
   },
   _extend_scope: function(scope){
     var shared_helpers = helpers()
-    
-    // merge view helpers into scope
+
     if ( this.route && this.route.route_set ){
+      // merge route set helpers into view scope
       var merged_helpers = Picard.merge({}, shared_helpers, this.route.route_set.helpers())
       scope = Picard.merge({}, merged_helpers, scope)
+      
+      // use route_set layout if none defined on this scope
+      if ( typeof scope.layout == 'undefined' && this.route.route_set.layout )
+        scope.layout = this.route.route_set.layout
+      
     } else if ( Object.keys(shared_helpers) != 0 ) {
       scope = Picard.merge({}, shared_helpers, scope)
     }
@@ -281,4 +286,4 @@ var locals = {
 
 Picard = picard = exports
 Picard.request_extensions = request_extensions
-Picard.private_request_functions = locals
+Picard.internal_request_functions = locals
