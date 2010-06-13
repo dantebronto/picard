@@ -21,7 +21,7 @@ var request_extensions = {
         '<h3>' + ex.message + '</h3>' +
         '<pre>' + ex.stack + '</pre>'
     })    
-    sys.puts('\n' + ex.message + '\n' + ex.stack)
+    sys.puts(ex.stack)
   },
   on_screen: function(scope){    
     if( this.response.finished ){ return }
@@ -42,10 +42,13 @@ var request_extensions = {
     scope.headers.push([ 'Server', Picard.env.server || 'Picard ' + Picard.version ])
     scope.headers.push([ 'Content-Type', scope.type  || 'text/html' ])
     scope.headers = locals._set_cookies.call(req, scope.headers)
-
-    locals._build_document.call(req, scope)
     
-    sys.puts('\n' + (this._method || this.method).toUpperCase() + ' ' + this.parsed_url().pathname + ' ' + scope.status)
+    if ( scope.status == 500 )
+      req.send_data(scope)
+    else
+      locals._build_document.call(req, scope)
+    
+    sys.puts((this._method || this.method).toUpperCase() + ' ' + this.parsed_url().pathname + ' ' + scope.status)
     
     if( Picard.env.mode == 'development' ) 
       locals._log_params.call(req)
@@ -95,7 +98,7 @@ var request_extensions = {
   }
 }
 
-// private, does not need to be merged into request_extensions
+// private/protected, does not need to be merged into request_extensions
 
 var template_cache = {}
 
@@ -104,20 +107,22 @@ var locals = {
     var req = this
     scope = locals._extend_scope.call(req, scope)
     
-    if ( scope.body == undefined ) 
-      return // 500 caught, end request
-    
     locals._render_template.call(req, scope, function(){
       locals._render_layout.call(req, scope, function(){
         req.send_data(scope)
       })
     })
   },
-  _cached_template: function(filename, callback){
+  _cached_template: function(request, filename, callback){
     if ( template_cache[filename] )
       callback(template_cache[filename])
     else
       fs.readFile(filename, function(err, body){
+        if ( err ){
+          if( err.message) err.message += " " + filename
+          request_extensions.handle_exception.call(request, err)
+          return // something went wrong when reading file
+        }
         template_cache[filename] = haml(body.toString())
         callback(template_cache[filename])
       })
@@ -171,7 +176,7 @@ var locals = {
       'emit','addListener','removeListener','removeAllListeners','listeners', 'cookies', '_method' ]
       
       if ( skips.indexOf(prop) == -1 ) 
-        sys.puts(prop + ': ' + sys.inspect(this[prop]))
+        sys.puts('  ' + prop + ': ' + sys.inspect(this[prop]))
     }
   },
   _parse_cookies: function(){
@@ -199,7 +204,7 @@ var locals = {
     var basepath = Picard.env.root + Picard.env.views + '/'
     var filename = basepath + scope.layout + '.haml'
     
-    locals._cached_template(filename, function(template){
+    locals._cached_template(req, filename, function(template){
       var layout_content = locals._safe_render.call(req, template, scope)
       var yield = layout_content.match(/\=\=yield\(\)/)
       if ( yield ) scope.body = layout_content.replace(yield, scope.body)
@@ -229,7 +234,7 @@ var locals = {
     var basepath = Picard.env.root + Picard.env.views + '/'
     var filename = basepath + scope.template + '.haml'
     
-    locals._cached_template(filename, function(template){
+    locals._cached_template(req, filename, function(template){
       scope.body = locals._safe_render.call(req, template, scope)
       callback()
     })
