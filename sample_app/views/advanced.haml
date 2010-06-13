@@ -9,3 +9,12 @@
   %ul.todolist
     :foreach{ array: commands, value: "item" }
       %li= item.command
+
+  // messages from global "helpers" call
+  #message
+    = message()
+  
+  #odd
+    = odd(3)
+    %br
+    = odd(4)

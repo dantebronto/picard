@@ -39,7 +39,7 @@ var request_extensions = {
     scope.body     = scope.text     || scope.body || ''
     scope.encoding = scope.encoding || 'utf8'
     
-    scope.headers.push([ 'Server', Picard.env.server || 'Picard v0.2 "Shaka, when the walls fell"' ])
+    scope.headers.push([ 'Server', Picard.env.server || 'Picard ' + Picard.version ])
     scope.headers.push([ 'Content-Type', scope.type  || 'text/html' ])
     scope.headers = locals._set_cookies.call(req, scope.headers)
 

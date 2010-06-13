@@ -1,17 +1,19 @@
 require('./config/env')
 
-var require_dir = function(dir){
-  require('fs').readdir(dir, function(err, files){
-    for(var i=0, l = files.length; i<l; i++)
-      require(dir + files[i].replace(/.js$/, ''))
-  })
-}
+get('/', function(){
+  return { text: 'Hello Universe' }
+})
 
-require_dir('./controllers/')
-
-helpers({
-  bark: function(){
-    return "Bark!"
+get('/haml', function(){
+  return {
+    template: 'index',
+    print_date: function () {
+      return (new Date()).toDateString();
+    },
+    current_user: {
+      name: "Jean-Luc Picard",
+      bio: "Captain of the USS Enterprise"
+    }
   }
 })
 
@@ -24,6 +26,16 @@ get('/json', function(){
   return {
     type: 'application/json',
     body: JSON.stringify(commands)
+  }
+})
+
+// call "helpers" to add functions or properties to the view scope
+helpers({
+  message: function(){
+    return "Welcome to Picard!"
+  },
+  odd: function(num){
+    return num + (num % 2 == 0 ? " is even" : " is odd")
   }
 })
 
@@ -151,3 +163,7 @@ get('/holodeck', function(request){
 get('/foo/bar/*:baz', function(params) {
   return {text: "Globbed params for 'baz': " + params.baz}
 })
+
+// controllers are groups of routes nested under a "route_set"
+require('./controllers/ops_controller')
+require('./controllers/test_controller')

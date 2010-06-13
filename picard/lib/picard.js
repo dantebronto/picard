@@ -26,5 +26,6 @@ Picard.merge({
     require('sys').
       puts('Starting in ' + Picard.env.mode + ' mode.\n' +
            'Picard boldly goes on port ' + Picard.env.port + '...')
-  }
+  },
+  version: 'v0.2 "Shaka, when the walls fell"'
 })
