@@ -92,6 +92,10 @@ get(/\/selective\/(\d+)/, function(params){ // must be a number
   return { text: params.captures[0] }
 })
 
+get('/get_with_params', function(env){ // called with ?foo=bar&baz=bat
+  return { text: env.foo + " " + env.baz }
+})
+
 get('/this_will_fail', function(){
   foo.bar // foo is undefined
 })

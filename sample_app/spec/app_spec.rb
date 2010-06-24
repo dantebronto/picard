@@ -70,6 +70,11 @@ describe 'GET' do
     res.header_str.should include('500')
     res.body_str.should include("<h3>foo is not defined</h3>")
   end
+  
+  it 'should extract params from a url with a query string' do
+    res = Curl::Easy.perform(base_url + '/get_with_params?foo=bar&baz=bat')
+    res.body_str.should include("bar bat")
+  end
 
 end
 
