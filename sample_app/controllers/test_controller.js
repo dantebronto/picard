@@ -4,7 +4,7 @@ route_set(function(){ // no name given
     message: function(name){
       return 'Hello ' + (name ? name : '')
     },
-    version: route_sets().operations.helpers().version
+    version: route_set('operations').helpers().version
   })
   
   this.get('/anonymous_route_set', function(){

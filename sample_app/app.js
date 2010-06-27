@@ -34,7 +34,7 @@ helpers({
   message: function(){
     return "Welcome to Picard!"
   },
-  odd: function(num){
+  parity: function(num){
     return num + (num % 2 == 0 ? " is even" : " is odd")
   }
 })

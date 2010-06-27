@@ -107,10 +107,7 @@ GLOBAL.route_set = function(name, handler){
     route_set_cache[name] = route_set_scope
     handler.apply(route_set_scope)
   }
-}
-
-GLOBAL.route_sets = function(){
-  return route_set_cache
+  return route_set_cache[name]
 }
 
 Picard.routes = routes
