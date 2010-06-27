@@ -114,7 +114,7 @@ var locals = {
     })
   },
   _cached_template: function(request, filename, callback){
-    if ( template_cache[filename] )
+    if ( template_cache[filename] && Picard.env.mode != 'development' )
       callback(template_cache[filename])
     else
       fs.readFile(filename, function(err, body){
