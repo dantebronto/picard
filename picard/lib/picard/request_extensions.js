@@ -148,6 +148,9 @@ var locals = {
     try {
       if( chunk == undefined ) { return }
       var chunks = chunk.toString().replace(/\+/g, '%20').split('&')
+      
+      this.post_body = ('post_body' in this) ? this.post_body + chunk : chunk;
+      
       for(var i in chunks){
         var k_v = chunks[i].split('=')
         this[k_v[0]] = decodeURIComponent(k_v[1])
@@ -169,11 +172,14 @@ var locals = {
       this.captures[i] = match_data[i]
   },
   _log_params: function(){
+    if( this.post_body )
+      sys.puts('  post_body: ' + this.post_body.toString())
+    
     for( var prop in this ){
       var skips = [ 'socket','connection','httpVersion','headers','url','cookie','method','statusCode','client','httpVersionMajor',
       'httpVersionMinor','upgrade','handle_exception','on_screen','parsed_url','redirect','send_data','serve_static','response',
       '_events','captures','route','constructor','_parseQueryString','setBodyEncoding','setEncoding','pause','resume','_addHeaderLine',
-      'emit','addListener','removeListener','removeAllListeners','listeners', 'cookies', '_method' ]
+      'emit','addListener','removeListener','removeAllListeners','listeners', 'cookies', '_method', 'post_body' ]
       
       if ( skips.indexOf(prop) == -1 ) 
         sys.puts('  ' + prop + ': ' + sys.inspect(this[prop]))
