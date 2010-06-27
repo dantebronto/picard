@@ -93,7 +93,8 @@ get(/\/selective\/(\d+)/, function(params){ // must be a number
 })
 
 get('/get_with_params', function(env){ // called with ?foo=bar&baz=bat
-  return { text: env.foo + " " + env.baz }
+  var query = env.parsed_url().query   // access query string
+  return { text: query.foo + " " + query.baz }
 })
 
 get('/this_will_fail', function(){

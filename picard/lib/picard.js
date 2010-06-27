@@ -12,8 +12,6 @@ Picard.merge({
       Picard.merge(request, Picard.request_extensions)
       request.response = response
       
-      locals._extract_path_params.call(request)
-      
       request.addListener('data', function(chunk){ 
         locals._extract_form_params.call(request, chunk)
       })
