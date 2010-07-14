@@ -43,7 +43,7 @@ var request_extensions = {
     scope.headers.push([ 'Content-Type', scope.type  || 'text/html' ])
     scope.headers = locals._set_cookies.call(req, scope.headers)
     
-    if ( scope.status == 500 )
+    if ( scope.status == 500 && !scope.template )
       req.send_data(scope)
     else
       locals._build_document.call(req, scope)

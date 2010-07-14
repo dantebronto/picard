@@ -169,6 +169,14 @@ get('/foo/bar/*:baz', function(params) {
   return {text: "Globbed params for 'baz': " + params.baz}
 })
 
+get('/status/500', function(env){
+  env.on_screen({ // render a template
+    status: 500, 
+    template: 'advanced',
+    commands: commands
+  })
+})
+
 // controllers are groups of routes nested under a "route_set"
 require('./controllers/ops_controller')
 require('./controllers/test_controller')

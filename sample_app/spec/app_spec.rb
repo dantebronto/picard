@@ -297,4 +297,10 @@ describe 'error handling' do
     res = Curl::Easy.perform(base_url + '/anonymous_fail_route')
     res.body_str.should include("foo is not defined")
   end
+  
+  it 'should allow template rendering if the status is 500' do
+    res = Curl::Easy.perform(base_url + '/status/500')
+    res.body_str.should include('is even')
+    res.header_str.should include('500')
+  end
 end
