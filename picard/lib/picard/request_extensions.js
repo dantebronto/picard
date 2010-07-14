@@ -152,7 +152,7 @@ var locals = {
       this.post_body = ('post_body' in this) ? this.post_body + chunk : chunk;
       
       for(var i in chunks){
-        var k_v = chunks[i].split('=')
+        var k_v = chunks[i].toString().split('=')
         this[k_v[0]] = decodeURIComponent(k_v[1])
       }
     } catch(ex) {
