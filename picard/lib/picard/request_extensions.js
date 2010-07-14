@@ -220,7 +220,7 @@ var locals = {
   _render_partial: function(name, scope, partial_scope){
     var filename = Picard.env.root + Picard.env.views + '/' + name + '.haml'
     var body
-    if ( typeof template_cache[filename] == 'undefined' ) {
+    if ( typeof template_cache[filename] == 'undefined' || Picard.env.mode == 'development' ) {
       body = fs.readFileSync(filename)
       template_cache[filename] = haml(body.toString())
     }
