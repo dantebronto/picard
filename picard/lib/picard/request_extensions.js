@@ -73,7 +73,7 @@ var request_extensions = {
     if( !scope.body ) return
     scope.headers.push([ 'Content-Length', scope.body.length ])
     scope.headers.push([ 'Content-Encoding', scope.encoding ])
-    this.response.writeHeader(scope.status, scope.headers)
+    this.response.writeHead(scope.status, scope.headers)
     this.response.write(scope.body, scope.encoding)
     this.response.end()
   },
