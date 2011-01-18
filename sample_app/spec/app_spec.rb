@@ -140,6 +140,7 @@ describe 'static assets' do
   end
   
   it 'should serve images' do
+    # $.get('/picard.jpg', function(res){ console.log(/gd-jpeg/.test(res)) })
     res = Curl::Easy.perform(base_url + '/picard.jpg')
     img_bin = "\377\330\377\340\000\020JFIF\000\001\001\000\000\001\000\001\000\000\377\376\000>CREATOR: gd-jpeg v1.0 (using IJG JPEG v62), default quality\n\377\333\000C\000\b"
     res.body_str.include?(img_bin).should be_true
@@ -219,7 +220,7 @@ describe 'partials and layouts' do
   end
   
   it 'should render the layout' do
-    @res.body_str.should include('v0.2 "Shaka, when the walls fell"')
+    @res.body_str.should include('DOCTYPE')
   end
   
   it 'should render the template' do
@@ -256,7 +257,7 @@ describe 'route sets' do
     res = Curl::Easy.perform(base_url + '/ops/version')
     res.body_str.should include("App is running")
     res.body_str.should include("Application Version")
-    res.body_str.should include("v0.2")
+    res.body_str.should include("v0.3")
   end
   
   it 'should allow for route sets with no name given' do
@@ -272,7 +273,7 @@ describe 'route sets' do
   
   it 'should allow inclusion of helper functions from other route_sets' do
     res = Curl::Easy.perform(base_url + '/anonymous_route_set')
-    res.body_str.should include("when the walls fell")
+    res.body_str.should include("lights")
   end
   
   it 'should allow for the local override of a route_set helper' do

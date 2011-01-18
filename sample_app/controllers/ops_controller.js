@@ -8,7 +8,7 @@ route_set('operations', function(){
     message: function(){
       return "App is running" 
     },
-    version: Picard.version
+    version: require('../../lib/picard/server').version
   })
   
   // GET /ops/heartbeat

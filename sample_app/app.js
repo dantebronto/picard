@@ -1,4 +1,4 @@
-require('./config/env')
+var Picard = require('./config/env')
 
 get('/', function(){
   return { text: 'Hello Universe' }

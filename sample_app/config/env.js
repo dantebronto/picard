@@ -1,11 +1,16 @@
-require('../../lib/picard')
+var Picard = require('../../lib/picard')
 
-Picard.env = {
- root: __filename.replace(/\/config\/env.js$/, ''),
- port: 9900,
- public_dir: '/public',
- views: '/views',
- mode: 'development' // In development mode, requests parameters will be logged.
-}                    // Additionally, view templates will not be cached.
+Picard.config({
+  root: __dirname.replace(/\/config/, ''),
+  port: 9900,
+  public: '/public',
+  views: '/views',
+  mode: 'production' // In development mode, view templates will not be cached.
+})
+
+// can also do
+// Picard.set('views', '/my_view_dir')
 
 Picard.start()
+
+exports.picard = Picard
