@@ -1,4 +1,4 @@
-require('../../picard/lib/picard')
+require('../../lib/picard')
 
 Picard.env = {
  root: __filename.replace(/\/config\/env.js$/, ''),
