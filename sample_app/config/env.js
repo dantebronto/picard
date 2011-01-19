@@ -9,8 +9,8 @@ Picard.config({
 })
 
 // can also do
-// Picard.set('views', '/my_view_dir')
+// Picard.set('root', __dirname)
 
 Picard.start()
 
-exports.picard = Picard
+module.exports = Picard
