@@ -48,4 +48,30 @@ describe('Basic GETs and rendering', function(){
     asyncSpecWait()
   })
   
+  it('should follow redirects', function(){
+    testReq('GET', '/redirect', function(status, headers, body){
+      // rfc2616 10.3.3 Unless the request method was HEAD, the entity of the response
+      // SHOULD contain a short hypertext note with a hyperlink to the new URI(s).
+      expect(body).toMatch('<a href="/haml">/haml</a>')
+      expect(status).toEqual(302)
+      expect(headers.location).toEqual('/haml')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
 })
+
+describe('POST', function(){
+  
+  it('should do normal post', function(){
+    testReq('POST', '/order', function(status, _, body){
+      expect(body).toEqual('Tea, Earl Grey, Hot')
+      expect(status).toEqual(200)
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+})
+

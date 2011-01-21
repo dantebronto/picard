@@ -69,3 +69,13 @@ describe('RouteSets', function(){
   })
   
 })
+
+describe('error handling', function(){
+  it('should catch a 500 error if an error occurs during template rendering', function(){
+    testReq('GET', '/anonymous_fail_route', function(status, _, body){
+      expect(body).toMatch('foo is not defined')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+})

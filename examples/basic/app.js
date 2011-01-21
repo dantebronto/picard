@@ -4,11 +4,14 @@ var Picard = require('../../lib/picard')
 // functions from Picard into global namespace.
 // Functions from routing.js include 
 // REST verbs, helpers, and routeSet
-
 Picard.globalize()
 
 get('/', function(){
   return { text: 'Hello Universe' }
+})
+
+post('/order', function(){
+  return { text: 'Tea, Earl Grey, Hot' }
 })
 
 get('/haml', function(){
@@ -34,6 +37,10 @@ get('/json', function(){
     type: 'application/json',
     body: JSON.stringify(commands)
   }
+})
+
+get('/redirect/?', function(request){
+  return request.redirect('/haml')
 })
 
 Picard.start()

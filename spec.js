@@ -1,12 +1,11 @@
-var jasmine = require('jasmine-node/lib/jasmine'), // assumes jasmine is `require`able
+var jasmine = require('jasmine-node/lib/jasmine'),
     spawn = require('child_process').spawn,
     util = require('util'),
     http = require('http'),
     sys = require('sys')
     
-for(var key in jasmine) {
-  global[key] = jasmine[key];
-}
+for(var key in jasmine)
+  global[key] = jasmine[key]
 
 global.testReq = function(type, path, body, cb){
   var local = http.createClient(9900, 'localhost')
@@ -31,7 +30,6 @@ global.testReq = function(type, path, body, cb){
 }
 
 var runSpecsFor = function(appName, cb){
-  
   var app = spawn('node', [__dirname + '/examples/' + appName + '/app.js'])
   
   app.stdout.on('data', function(data){
@@ -41,24 +39,24 @@ var runSpecsFor = function(appName, cb){
     if ( /Picard boldly goes/.test(data) )
       jasmine.executeSpecsInFolder(spec, function(runner, log){
         app.kill('SIGHUP')
-        //process.exit(runner.results().failedCount)
       }, false, true)
     else
       util.print("\n" + data.replace("\n", '') + " ")
   })
   
   app.stderr.on('data', function(data){
-    sys.puts('fuckin error with the data!!')
-    sys.puts(sys.inspect(data))
+    sys.puts('fuck!')
+    sys.puts(data.toString())
   })
   
   app.on('exit', cb)
 }
 
-runSpecsFor('routing', function(){
-  runSpecsFor('basic', function(){
-    runSpecsFor('controllers', function(){
-      
-    })
-  })
-})
+runSpecsFor('basic',       function(){
+runSpecsFor('controllers', function(){
+runSpecsFor('cookie',      function(){
+runSpecsFor('haml',        function(){
+runSpecsFor('misc',        function(){
+runSpecsFor('routing',     function(){
+runSpecsFor('async',       function(){
+})})})})})})})
