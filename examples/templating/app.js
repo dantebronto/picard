@@ -10,6 +10,6 @@ Picard.get('/alternate_template', function(){
     template: 'custom',
     name: 'Jean-Luc Picard',
     people: ['Riker', 'Crusher', 'Data'],
-    _: _ // allow use of underscore in views
+    _: _ // allow use of underscore in view scope
   }
 })
