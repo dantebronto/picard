@@ -1,0 +1,7 @@
+<p>Hello: <%= name %></p>
+
+<ul>
+  <% _.each(people, function(name) { %> <li><%= name %></li> <% }); %>
+</ul>
+
+<%= partial('my_partial', { rank: "Cap'n" }) %>

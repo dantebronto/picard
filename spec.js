@@ -59,4 +59,5 @@ runSpecsFor('haml',        function(){
 runSpecsFor('misc',        function(){
 runSpecsFor('routing',     function(){
 runSpecsFor('async',       function(){
-})})})})})})})
+runSpecsFor('templating',  function(){
+})})})})})})})})

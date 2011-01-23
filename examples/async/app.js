@@ -17,17 +17,20 @@ Picard.get('/db', comments) // simulate a database result
 
 Picard.get('/async', function(env){
   
-  var local = require('http').createClient(9900, 'localhost')
-  var request = local.request('GET', '/db', {'host': 'localhost'})
-  var body = []
+  var local = require('http').createClient(9900, 'localhost'),
+      request = local.request('GET', '/db'),
+      body = []
   
-  request.addListener('response', function (response) {  
-    response.addListener('data', function (chunk) {
-      body.push(chunk)
-    })
-    response.addListener('end', function(){
-      env.onScreen({ body: body.join('') }) // will be comments from above
-    })
+  request.on('response', function (response) {
+    
+    response.
+      on('data', function (chunk) {
+        body.push(chunk)
+      }).
+      on('end', function(){
+        env.onScreen({ body: body.join('') }) // will be comments from above
+      })
+      
   }).end()
   
 })

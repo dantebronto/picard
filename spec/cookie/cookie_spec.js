@@ -1,4 +1,5 @@
 describe('cookies', function(){
+  
   it('should read from a set cookie', function(){
     testReq('GET', '/cookie', function(_, headers, body){
       expect(headers['set-cookie']).toMatch('hobby=literature')
@@ -16,4 +17,5 @@ describe('cookies', function(){
     })
     asyncSpecWait()
   })
+  
 })
