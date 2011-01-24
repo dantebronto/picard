@@ -87,3 +87,25 @@ describe('DELETE', function(){
   })
   
 })
+
+describe('custom error and 404 handlers', function(){
+  
+  it('should allow for custom 500 handlers', function(){
+    testReq('GET', '/throws/error', function(status, _, body){
+      expect(body).toMatch('<h1> Custom 500 Error! </h1><h3>foo is not defined</h3>')
+      expect(status).toEqual(500)
+      asyncSpecDone()
+    })
+    asyncSpecWait()    
+  })
+  
+  it('should allow for custom 404 handlers', function(){
+    testReq('GET', '/does/not/exist', function(status, _, body){
+      expect(body).toEqual('<h1> Custom 404! </h1>')
+      expect(status).toEqual(404)
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+})
