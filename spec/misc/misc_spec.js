@@ -1,3 +1,36 @@
+describe('GET', function(){
+  
+  it('should allow a triplet response', function(){
+    testReq('GET', '/returns_triplet', function(status, headers, body){
+      expect(status).toEqual(201)
+      expect(body).toEqual('this is the response')
+      expect(headers['content-type']).toEqual('application/foo')
+      expect(headers['custom-header']).toEqual('cool')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+  it('should allow a string response', function(){ 
+    testReq('GET', '/returns_string', function(status, headers, body){
+      expect(status).toEqual(200)
+      expect(body).toEqual('this is the response')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+  it('should allow route passing', function(){
+    testReq('GET', '/passing/to_me', function(status, headers, body){
+      expect(status).toEqual(200)
+      expect(body).toEqual('passed from previous route')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+})
+
 describe('POST', function(){  
   
   it('should accept parameters', function(){
