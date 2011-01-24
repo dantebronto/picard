@@ -53,3 +53,16 @@ describe('partials and layouts', function(){
   })
   
 })
+
+describe('error handling', function(){
+    
+  it('should allow template rendering if the status is 500', function(){
+    testReq('GET', '/status/500', function(status, headers, body){
+      expect(status).toEqual(500) 
+      expect(body).toMatch('is even')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+})

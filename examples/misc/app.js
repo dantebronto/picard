@@ -1,4 +1,4 @@
-var Picard = require('../../lib/picard').
+require('../../lib/picard').
 
 // Many top-level functions return 'this', allowing
 // for chaining of routes without calling Picard.globalize()
@@ -18,4 +18,6 @@ del('/fire/:number', function(params){
     text = '<h1>Maximum yield, full spread!</h1>'
     
   return { text: text }
-})
+}).
+
+start()

@@ -22,15 +22,14 @@ Picard.get('/async', function(env){
       body = []
   
   request.on('response', function (response) {
-    
     response.
       on('data', function (chunk) {
         body.push(chunk)
       }).
       on('end', function(){
-        env.onScreen({ body: body.join('') }) // will be comments from above
+        // onScreen delivers the response here
+        env.onScreen({ body: body.join('') })
       })
-      
   }).end()
   
 })
