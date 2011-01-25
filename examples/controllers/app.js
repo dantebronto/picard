@@ -4,7 +4,7 @@ var Picard = require('../../lib/picard').start()
 
 Picard.routeSet('operations', function(){
   
-  var ops = this;
+  var ops = this
   ops.pathPrefix = '/ops'
   ops.layout = 'application'
   
