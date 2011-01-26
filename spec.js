@@ -33,7 +33,12 @@ var SpecRunner = {
   run: function(){
     var self = this
     spawn('ls', ['-1', __dirname + '/spec']).stdout.on('data', function(res){
-      self.allSpecs = res.toString().split("\n")
+      
+      if ( process.argv[2] != undefined ) // `node spec.js basic`
+        self.allSpecs = [process.argv[2]]
+      else
+        self.allSpecs = res.toString().split("\n")
+      
       SpecRunner.runSpecsFor(self.allSpecs.shift(), self.nextSpec)
     })
   },
@@ -42,18 +47,21 @@ var SpecRunner = {
     if ( typeof spec != 'undefined' && spec != '' )
       SpecRunner.runSpecsFor(spec, SpecRunner.nextSpec)
   },
-  runSpecsFor: function(appName, cb){
-    var app, cmd = 'node', ext = 'js'
-
+  spawn: function(appName){
+    var cmd = 'node', ext = 'js'
+    
     if ( /coffee/.test(appName) )
       ext = cmd = 'coffee'
 
-    app = spawn(cmd, [__dirname + '/examples/' + appName + '/app' + '.' + ext])
-
+    return spawn(cmd, [__dirname + '/examples/' + appName + '/app' + '.' + ext])
+  },
+  runSpecsFor: function(appName, cb){
+    var app = SpecRunner.spawn(appName)
+    
     app.stdout.on('data', function(data){
       data = data.toString()
       var spec = __dirname + '/spec/' + appName
-
+      
       if ( /Picard boldly goes/.test(data) )
         jasmine.executeSpecsInFolder(spec, function(runner, log){
           app.kill('SIGHUP')

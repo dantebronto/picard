@@ -17,10 +17,10 @@ post('/order', function(){
 get('/haml', function(){
   return {
     template: 'index',
-    print_date: function () {
+    printDate: function () {
       return (new Date()).toDateString();
     },
-    current_user: {
+    currentUser: {
       name: "Jean-Luc Picard",
       bio: "Captain of the USS Enterprise"
     }
@@ -40,7 +40,7 @@ get('/json', function(){
 })
 
 get('/redirect/?', function(request){
-  return request.redirect('/haml')
+  request.redirect('/haml')
 })
 
 Picard.start()

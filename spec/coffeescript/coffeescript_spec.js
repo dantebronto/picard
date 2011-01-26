@@ -3,7 +3,7 @@ describe('can use coffeescript', function(){
   it('should allow routes written in coffeescript', function(){
     testReq('GET', '/', function(status, _, body){
       expect(status).toEqual(200)
-      expect(body).toMatch('Hello Universe')
+      expect(body).toMatch('Wicked short route')
       asyncSpecDone()
     })
     asyncSpecWait()
@@ -16,5 +16,5 @@ describe('can use coffeescript', function(){
     })
     asyncSpecWait()
   })
-        
+          
 })
