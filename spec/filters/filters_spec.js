@@ -32,3 +32,25 @@ describe('advanced before filters', function(){
   })
   
 })
+
+describe('after filters', function(){
+  
+  it('should allow after filters', function(){
+    testReq('GET', '/fake_path', function(status, _, body){
+      expect(status).toEqual(200)
+      expect(body).toMatch('fake path')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+  it('should honor onScreen calls from the before filters', function(){
+    testReq('GET', '/foo_path', function(status, _, body){
+      expect(status).toEqual(200)
+      expect(body).toMatch('foo path')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+  
+})
