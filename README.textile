@@ -4,7 +4,9 @@ h1. Picard: A Micro-framework for node.js
 
 p. Picard uses Haml thanks to creationix's haml-js project.
 
-p. Check the examples to see what is possible.
+p. Check the examples to see what is possible. 
+
+p. master branch was last tested against node.js v0.3.7.
 
 h3. License
 
