@@ -75,3 +75,16 @@ describe('POST', function(){
   
 })
 
+describe('HEAD', function(){
+
+  it('should support HEAD', function(){
+    testReq('HEAD', '/', function(status, headers, body){
+      expect(status).toMatch(200)
+      expect(headers['content-length']).toEqual('14')
+      expect(body).toMatch('')
+      asyncSpecDone()
+    })
+    asyncSpecWait()
+  })
+
+})
