@@ -1,6 +1,6 @@
 var Picard = require('../../lib/picard')
 
-// Break common.js standards and copy 
+// Break CommonJS standards and copy 
 // functions from Picard into global namespace.
 // Functions from routing.js include 
 // REST verbs, helpers, and routeSet

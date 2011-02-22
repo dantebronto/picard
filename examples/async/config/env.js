@@ -5,6 +5,7 @@ Picard.config({ // All possible options
   port: 9900,
   public: '/public',
   views: '/views',
+  version: 'My Custom String v0.1', // or null to omit
   mode: 'production' // In development mode, view templates will not be cached.
 })
 
