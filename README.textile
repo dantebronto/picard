@@ -6,7 +6,7 @@ p. Picard uses Haml thanks to creationix's haml-js project.
 
 p. Check the examples to see what is possible. 
 
-p. master branch was last tested against node.js v0.3.7.
+p. master branch was last tested against node.js v0.4.0.
 
 h3. License
 
