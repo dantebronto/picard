@@ -1,0 +1,8 @@
+{
+  "name": "picard",
+  "description": "A Micro-framework for node.js",
+  "version": "0.3.0",
+  "author": "Kellen Presley <klpresley@gmail.com>",
+  "main": "lib/picard/index",
+  "engines": { "node": ">= 0.3.0" }
+}
