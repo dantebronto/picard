@@ -13,7 +13,8 @@ get('/cookie', function(request){
     domain: '.your_domain.org', 
     path: '/cookie', 
     expires: expires, 
-    secure: true 
+    secure: true,
+    httpOnly: true
   })
 
   return { // will render 'literature'
